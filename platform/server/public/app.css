@@ -1,0 +1,106 @@
+:root {
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --fg: #1f2328;
+  --muted: #5f6b7a;
+  --line: #e3e7ec;
+  --green: #0f9d58;
+  --green-d: #0b8048;
+  --blue: #1565c0;
+  --orange: #b85c00;
+  --orange-bg: #fff4e5;
+  --red: #d32f2f;
+  --shopee: #ee4d2d;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121416;
+    --card: #1b1e22;
+    --fg: #e6e8eb;
+    --muted: #9aa3ad;
+    --line: #2b3036;
+    --orange: #ffb35c;
+    --orange-bg: #2e2112;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 560px; margin: 0 auto; padding: 16px 16px 40px; }
+header.top { display: flex; align-items: center; gap: 10px; padding: 8px 0 16px; }
+header.top img { width: 36px; height: 36px; border-radius: 9px; }
+header.top b { font-size: 19px; }
+header.top .who { margin-left: auto; color: var(--muted); font-size: 13px; text-align: right; }
+h1 { font-size: 22px; margin: 0 0 6px; }
+h2 { font-size: 17px; margin: 0 0 8px; }
+p { margin: 6px 0 12px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%;
+  border: 0; border-radius: 10px;
+  padding: 13px 16px;
+  background: var(--green); color: #fff;
+  font-family: inherit; font-size: 16px; font-weight: 600; line-height: 1.2;
+  text-decoration: none; cursor: pointer;
+}
+.btn:hover { background: var(--green-d); }
+.btn:disabled { opacity: .6; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.btn.small { width: auto; padding: 7px 12px; font-size: 14px; }
+input[type=text], input[type=url], input[type=tel] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--bg); color: var(--fg);
+  font-family: inherit; font-size: 16px;
+}
+input:focus { outline: 2px solid var(--green); border-color: transparent; }
+label.field { display: block; margin: 10px 0; }
+label.field span { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+.row { display: flex; gap: 8px; }
+.row > * { flex: 1; }
+.msg { min-height: 1.2em; font-weight: 600; margin: 8px 0; }
+.msg.err { color: var(--red); }
+.msg.ok { color: var(--green); }
+.big-status { text-align: center; padding: 40px 12px; }
+.spinner {
+  width: 42px; height: 42px; margin: 0 auto 16px;
+  border-radius: 50%; border: 4px solid var(--line); border-top-color: var(--green);
+  animation: spin .9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.totals div { background: var(--bg); border-radius: 10px; padding: 10px 4px; }
+.totals b { display: block; font-size: 17px; }
+.totals span { font-size: 12px; color: var(--muted); }
+.totals .owed b { color: var(--green); }
+ul.list { list-style: none; margin: 0; padding: 0; }
+ul.list li { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+ul.list li:first-child { border-top: 0; }
+ul.list img { width: 46px; height: 46px; border-radius: 8px; object-fit: cover; background: var(--line); flex: none; }
+ul.list .t { flex: 1; min-width: 0; }
+ul.list .t b { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+ul.list .t span { font-size: 12px; color: var(--muted); }
+.badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; color: #fff; white-space: nowrap; align-self: center; }
+.badge.pending { background: var(--blue); }
+.badge.approved { background: var(--green); }
+.badge.rejected { background: var(--red); }
+ol.steps { padding-left: 20px; margin: 6px 0; }
+ol.steps li { margin: 6px 0; }
+.note { background: var(--orange-bg); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+code.box { display: block; word-break: break-all; background: var(--bg); padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+[hidden] { display: none !important; }

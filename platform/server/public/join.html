@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f9d58">
+  <title>Tham gia ClickDeal</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body data-page="join">
+  <div class="wrap">
+    <header class="top">
+      <img src="/icons/icon-192.png" alt="">
+      <b>ClickDeal</b>
+    </header>
+
+    <div class="card" id="loading"><div class="big-status"><div class="spinner"></div>Đang tải…</div></div>
+
+    <div class="card" id="bad" hidden>
+      <h1>Link mời không đúng</h1>
+      <p class="muted" id="badMsg">Hãy hỏi lại người giới thiệu link mời mới.</p>
+      <a class="btn ghost" href="/">Về trang chủ</a>
+    </div>
+
+    <div class="card" id="form" hidden>
+      <h1><span id="affName"></span> mời bạn mua Shopee nhận hoàn tiền</h1>
+      <p class="muted">Mỗi đơn mua qua ClickDeal, bạn được hoàn khoảng <b id="affRate"></b> hoa hồng. <span id="affNameShort"></span> sẽ chuyển tiền cho bạn.</p>
+      <form id="joinForm">
+        <label class="field"><span>Tên gọi của bạn</span>
+          <input type="text" id="nickname" maxlength="40" placeholder="vd: Lan" required>
+        </label>
+        <label class="field"><span>Zalo hoặc số điện thoại để nhận tiền (không bắt buộc)</span>
+          <input type="tel" id="contact" maxlength="80" placeholder="vd: 09xx xxx xxx">
+        </label>
+        <div class="msg" id="joinMsg"></div>
+        <button class="btn" type="submit">Tham gia</button>
+      </form>
+      <p class="small muted">Thông tin liên hệ được mã hóa, chỉ <span id="affName2"></span> xem được để trả tiền. Bạn có thể xóa bất cứ lúc nào.</p>
+    </div>
+
+    <div class="card" id="already" hidden>
+      <h1>Bạn đã tham gia rồi</h1>
+      <p class="muted" id="alreadyMsg"></p>
+      <a class="btn" href="/">Mở ClickDeal</a>
+    </div>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

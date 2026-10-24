@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f9d58">
+  <title>ClickDeal</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body data-page="home">
+  <div class="wrap">
+    <header class="top">
+      <img src="/icons/icon-192.png" alt="">
+      <b>ClickDeal</b>
+      <div class="who" id="who"></div>
+    </header>
+
+    <!-- Chưa tham gia -->
+    <section id="notJoined" hidden>
+      <div class="card">
+        <h1>Mua Shopee, nhận lại tiền</h1>
+        <p class="muted">Bạn cần <b>link mời</b> từ người giới thiệu (affiliate) để bắt đầu. Có mã mời thì nhập vào đây:</p>
+        <form id="codeForm" class="row">
+          <input type="text" id="codeInput" placeholder="Mã mời, vd: PHUC" autocomplete="off" autocapitalize="characters" required>
+          <button class="btn small" type="submit">Tiếp tục</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Đã tham gia -->
+    <section id="joined" hidden>
+      <div class="card">
+        <h2>Tiền hoàn của bạn</h2>
+        <div class="totals">
+          <div><b id="tPending">0₫</b><span>Chờ duyệt</span></div>
+          <div class="owed"><b id="tOwed">0₫</b><span>Được nhận</span></div>
+          <div><b id="tPaid">0₫</b><span>Đã nhận</span></div>
+        </div>
+        <p class="small muted" id="rateLine"></p>
+      </div>
+
+      <div class="card">
+        <h2>Dán link sản phẩm Shopee</h2>
+        <form id="pasteForm">
+          <input type="url" id="pasteInput" placeholder="https://s.shopee.vn/..." required>
+          <div class="msg" id="pasteMsg"></div>
+          <button class="btn" type="submit">Mở bằng link hoàn tiền</button>
+        </form>
+      </div>
+
+      <div class="card" id="installCard">
+        <h2>Nhanh nhất: chia sẻ thẳng từ app Shopee</h2>
+        <div id="androidGuide">
+          <ol class="steps">
+            <li>Bấm nút dưới để <b>cài ClickDeal lên màn hình chính</b> (1 lần).</li>
+            <li>Trong app Shopee, mở sản phẩm → bấm <b>Chia sẻ</b> → chọn <b>ClickDeal</b>.</li>
+            <li>ClickDeal tự mở lại sản phẩm qua link hoàn tiền. Bấm <b>Mua ngay</b> như bình thường.</li>
+          </ol>
+          <button class="btn" id="installBtn" type="button" hidden>Cài ClickDeal lên màn hình chính</button>
+          <p class="small muted" id="installHint">Nếu không thấy nút cài: mở menu ⋮ của Chrome → "Thêm vào Màn hình chính".</p>
+        </div>
+        <div id="iosGuide" hidden>
+          <p>Trên iPhone, dùng <b>Phím tắt</b> (Shortcuts) để ClickDeal hiện trong menu Chia sẻ:</p>
+          <ol class="steps">
+            <li>Mở app <b>Phím tắt</b> → bấm <b>+</b> → đặt tên <b>ClickDeal</b>.</li>
+            <li>Bấm ⓘ → bật <b>Hiển thị trong Bảng chia sẻ</b>, nhận <b>URL và Văn bản</b>.</li>
+            <li>Thêm tác vụ <b>Mở URL</b>, dán địa chỉ dưới rồi chèn biến <b>Đầu vào phím tắt</b> vào cuối:</li>
+          </ol>
+          <code class="box" id="shortcutUrl"></code>
+          <button class="btn ghost small" id="copyShortcut" type="button">Copy địa chỉ</button>
+          <p class="small muted">Sau đó trong app Shopee: <b>Chia sẻ</b> → <b>ClickDeal</b>. Lưu ý: tham gia bằng link mời trong <b>Safari</b> để Phím tắt dùng được.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Đơn hàng</h2>
+        <ul class="list" id="orders"></ul>
+        <p class="small muted" id="ordersEmpty">Chưa có đơn nào. Đơn thường hiện sau vài phút đến vài giờ kể từ lúc đặt.</p>
+      </div>
+
+      <div class="card">
+        <h2>Sản phẩm đã mở gần đây</h2>
+        <ul class="list" id="links"></ul>
+        <p class="small muted" id="linksEmpty">Chưa có.</p>
+      </div>
+
+      <div class="card">
+        <h2>Tiện ích trên máy tính</h2>
+        <p class="small muted">Dùng Chrome/Firefox trên máy tính? Cài tiện ích ClickDeal rồi dán mã kết nối này vào phần cài đặt của tiện ích:</p>
+        <button class="btn ghost small" id="showToken" type="button">Hiện mã kết nối</button>
+        <code class="box" id="tokenBox" hidden></code>
+        <p class="small muted">Không chia sẻ mã này cho người khác.</p>
+        <button class="btn ghost small" id="leaveBtn" type="button">Xóa dữ liệu của tôi và thoát</button>
+      </div>
+    </section>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+{
+  "manifest_version": 3,
+  "name": "LT ClickDeal - Mua Shopee nhận hoàn tiền",
+  "short_name": "ClickDeal",
+  "version": "0.2.0",
+  "description": "Thêm nút 'Mua qua hoàn tiền' trên Shopee: tự đẩy link sang trang hoàn tiền (TietKiem360, HoanTien…), lấy link affiliate và lưu lịch sử mua.",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://shopee.vn/*",
+    "*://*.shopee.vn/*",
+    "*://hoantien.com/*",
+    "*://*.hoantien.com/*",
+    "*://tietkiem360.site/*",
+    "*://*.tietkiem360.site/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "scripts": [
+      "config.js",
+      "background.js"
+    ]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "clickdeal@lt-clickdeal",
+      "strict_min_version": "121.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://shopee.vn/*",
+        "*://*.shopee.vn/*"
+      ],
+      "js": [
+        "config.js",
+        "content/shopee.js"
+      ],
+      "css": [
+        "content/ui.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://hoantien.com/*",
+        "*://*.hoantien.com/*",
+        "*://tietkiem360.site/*",
+        "*://*.tietkiem360.site/*"
+      ],
+      "js": [
+        "config.js",
+        "content/provider.js"
+      ],
+      "css": [
+        "content/ui.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "ClickDeal - Lịch sử hoàn tiền",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

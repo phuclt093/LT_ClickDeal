@@ -1,0 +1,33 @@
+# ClickDeal — chạy trên máy Ubuntu ở nhà hoặc VPS.
+# Cài nhanh: bash ../deploy/install.sh   (tự tạo .env, chạy Docker, mở Cloudflare Tunnel)
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: clickdeal
+      POSTGRES_USER: clickdeal
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?đặt POSTGRES_PASSWORD trong .env}
+    volumes: [dbdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clickdeal -d clickdeal"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  api:
+    build: .
+    env_file: .env
+    depends_on:
+      db: { condition: service_healthy }
+    # chỉ mở cho chính máy này; ra internet qua Cloudflare Tunnel (không mở port modem)
+    ports: ["127.0.0.1:8080:8080"]
+    restart: unless-stopped
+  worker:
+    build: .
+    env_file: .env
+    depends_on:
+      db: { condition: service_healthy }
+    command: ["node", "dist/worker.js"]
+    restart: unless-stopped
+volumes:
+  dbdata:

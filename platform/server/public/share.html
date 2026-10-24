@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f9d58">
+  <meta name="referrer" content="no-referrer">
+  <title>Đang mở link hoàn tiền…</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body data-page="share">
+  <div class="wrap">
+    <div class="card big-status" id="working">
+      <div class="spinner"></div>
+      <h2>Đang tạo link hoàn tiền…</h2>
+      <p class="muted small">Shopee sẽ tự mở lại sản phẩm trong giây lát.</p>
+    </div>
+    <div class="card" id="failed" hidden>
+      <h2>Chưa tạo được link hoàn tiền</h2>
+      <p class="msg err" id="failMsg"></p>
+      <button class="btn" id="retryBtn" type="button">Thử lại</button>
+      <p></p>
+      <a class="btn ghost" id="plainLink" hidden>Mở sản phẩm (không hoàn tiền)</a>
+      <p></p>
+      <a class="btn ghost" href="/">Về ClickDeal</a>
+    </div>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

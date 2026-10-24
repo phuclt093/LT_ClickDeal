@@ -1,0 +1,18 @@
+[Unit]
+Description=ClickDeal - Cloudflare quick tunnel (https://*.trycloudflare.com)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+# Chỉ kết nối ra ngoài tới Cloudflare; không mở port nào trên máy/modem
+ExecStart=/usr/bin/env cloudflared tunnel --no-autoupdate --url http://127.0.0.1:8080
+Restart=always
+RestartSec=5
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

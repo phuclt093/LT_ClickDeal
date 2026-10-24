@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f9d58">
+  <meta name="robots" content="noindex">
+  <title>ClickDeal cho affiliate</title>
+  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/aff/aff.css">
+</head>
+<body>
+  <div class="wrap wide">
+    <header class="top">
+      <img src="/icons/icon-192.png" alt="">
+      <b>ClickDeal <span class="muted small">cho affiliate</span></b>
+      <div class="who"><span id="who"></span> <button class="btn ghost small" id="logoutBtn" type="button" hidden>Đăng xuất</button></div>
+    </header>
+
+    <div class="card" id="loading"><div class="big-status"><div class="spinner"></div></div></div>
+
+    <!-- Đăng nhập / đăng ký -->
+    <section id="auth" hidden>
+      <div class="card">
+        <div class="tabs">
+          <button type="button" class="tab active" data-tab="login">Đăng nhập</button>
+          <button type="button" class="tab" data-tab="register">Đăng ký affiliate</button>
+        </div>
+        <form id="loginForm">
+          <label class="field"><span>Email</span><input type="email" id="lEmail" autocomplete="username" required></label>
+          <label class="field"><span>Mật khẩu</span><input type="password" id="lPass" autocomplete="current-password" required></label>
+          <label class="field"><span>Mã 2FA 6 số (nếu đã bật)</span><input type="text" id="lTotp" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
+          <div class="msg" id="loginMsg"></div>
+          <button class="btn" type="submit">Đăng nhập</button>
+        </form>
+        <form id="registerForm" hidden>
+          <label class="field"><span>Tên hiển thị với khách</span><input type="text" id="rName" maxlength="80" placeholder="vd: Phúc Deal" required></label>
+          <label class="field"><span>Mã affiliate (khách thấy trong link mời)</span><input type="text" id="rCode" maxlength="20" placeholder="vd: PHUC" autocapitalize="characters" required></label>
+          <label class="field"><span>Email</span><input type="email" id="rEmail" autocomplete="username" required></label>
+          <label class="field"><span>Mật khẩu (tối thiểu 10 ký tự)</span><input type="password" id="rPass" minlength="10" autocomplete="new-password" required></label>
+          <div class="msg" id="registerMsg"></div>
+          <button class="btn" type="submit">Tạo tài khoản</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Bật 2FA -->
+    <section id="mfa" hidden>
+      <div class="card">
+        <h1>Bật xác thực 2 lớp (bắt buộc)</h1>
+        <ol class="steps">
+          <li>Cài ứng dụng <b>Google Authenticator</b> hoặc <b>Microsoft Authenticator</b> trên điện thoại.</li>
+          <li>Quét mã QR dưới đây (hoặc nhập mã bí mật).</li>
+          <li>Nhập 6 số ứng dụng hiện ra rồi bấm Xác nhận.</li>
+        </ol>
+        <div class="qr"><img id="qrImg" alt="Mã QR 2FA"></div>
+        <code class="box" id="secretBox"></code>
+        <form id="mfaForm" class="row">
+          <input type="text" id="mfaCode" inputmode="numeric" maxlength="6" placeholder="6 số" required>
+          <button class="btn small" type="submit">Xác nhận</button>
+        </form>
+        <div class="msg" id="mfaMsg"></div>
+      </div>
+    </section>
+
+    <!-- Bảng điều khiển -->
+    <section id="dash" hidden>
+      <div class="note" id="pendingNote" hidden>Tài khoản đang chờ duyệt. Khách chưa tham gia được cho tới khi được duyệt.</div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>1. Cổng nhận link</h2>
+          <p class="small muted">Địa chỉ trên tài khoản của bạn, nhận link Shopee và chuyển sang link affiliate của bạn. Dùng cổng mẫu Cloudflare/PHP trong thư mục <code>platform/gateway</code>, hoặc trang get link của bạn nếu nó nhận link qua địa chỉ.</p>
+          <p class="small" id="gwStatus"></p>
+          <form id="gwForm">
+            <input type="url" id="gwInput" placeholder="https://…/go?url={url}&amp;sub={sub}&amp;click={click}" required>
+            <div class="msg" id="gwMsg"></div>
+            <button class="btn" type="submit">Lưu cổng</button>
+          </form>
+          <p class="small" id="gwTest" hidden>Mở thử: <a id="gwTestLink" target="_blank" rel="noopener">link ví dụ</a>. Phải chuyển sang Shopee bằng link affiliate của bạn.</p>
+        </div>
+
+        <div class="card">
+          <h2>2. Link mời khách</h2>
+          <p class="small muted">Gửi link này cho khách (Zalo, Facebook…). Khách bấm vào là tham gia, không phải đăng ký gì.</p>
+          <code class="box" id="inviteBox"></code>
+          <div class="row">
+            <button class="btn small" id="copyInvite" type="button">Copy link mời</button>
+          </div>
+          <form id="rateForm" class="row rate">
+            <label class="field"><span>Tỉ lệ hoàn mặc định cho khách (%)</span>
+              <input type="number" id="rateInput" min="0" max="100" step="1" required>
+            </label>
+            <button class="btn small" type="submit">Lưu</button>
+          </form>
+          <div class="msg" id="rateMsg"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Khách của bạn <span class="muted small" id="custCount"></span></h2>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>Khách</th><th>Liên hệ</th><th>Mã khách</th><th class="num">Lượt bấm</th><th class="num">Đã trả</th><th></th></tr></thead>
+            <tbody id="custBody"></tbody>
+          </table>
+        </div>
+        <p class="small muted" id="custEmpty">Chưa có khách. Gửi link mời ở trên cho khách nhé.</p>
+        <p class="small muted">Đơn hàng xem trong tài khoản AccessTrade: mỗi đơn có <code>utm_content</code> bằng <b>mã khách</b>.</p>
+      </div>
+
+      <div class="card">
+        <h2>Lượt bấm mua gần đây</h2>
+        <ul class="list" id="linkList"></ul>
+        <p class="small muted" id="linkEmpty">Chưa có lượt nào.</p>
+      </div>
+    </section>
+  </div>
+  <script src="/aff/aff.js"></script>
+</body>
+</html>

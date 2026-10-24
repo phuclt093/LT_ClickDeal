@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thiết lập ClickDeal</title>
+  <link rel="icon" href="../icons/icon32.png">
+  <link rel="stylesheet" href="setup.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <img src="../icons/icon128.png" alt="" width="48" height="48">
+      <div>
+        <h1>Thiết lập ClickDeal</h1>
+        <p class="sub">Làm 1 lần, khoảng 3 phút. Sau đó mỗi lần mua Shopee chỉ cần bấm 1 nút là được hoàn tiền.</p>
+      </div>
+    </header>
+
+    <div id="needSetup" class="alert" hidden>
+      Bạn cần thiết lập xong các bước dưới đây thì nút <b>Mua qua hoàn tiền</b> mới hoạt động.
+    </div>
+
+    <div id="allDone" class="done-bar" hidden>
+      <span>🎉 Đã thiết lập xong! Mở một sản phẩm Shopee và bấm nút <b>💰 Mua qua hoàn tiền</b> cạnh nút Mua Ngay.</span>
+      <a class="btn" href="https://shopee.vn" target="_blank" rel="noopener">Mở Shopee</a>
+    </div>
+
+    <!-- Bước 1 -->
+    <section class="step" id="step1">
+      <div class="num">1</div>
+      <div class="content">
+        <h2>Chọn trang hoàn tiền</h2>
+        <p class="muted">Trang hoàn tiền là nơi nhận hoa hồng từ Shopee và trả lại tiền cho bạn.</p>
+        <div id="providers" class="providers"></div>
+      </div>
+    </section>
+
+    <!-- Bước 2 -->
+    <section class="step" id="step2">
+      <div class="num">2</div>
+      <div class="content">
+        <h2>Tạo tài khoản <span class="pname"></span></h2>
+        <p class="muted">Đã có tài khoản thì bỏ qua bước này.</p>
+        <div class="actions">
+          <a id="signupBtn" class="btn" target="_blank" rel="noopener">Mở trang đăng ký</a>
+          <a id="loginBtn" class="btn ghost" target="_blank" rel="noopener">Tôi đã có tài khoản, đăng nhập</a>
+        </div>
+        <p class="muted small">Khi điền form đăng ký, lưu ý:</p>
+        <ul id="tips" class="tips"></ul>
+        <div id="referral" class="referral" hidden>
+          Mã giới thiệu: <code id="refCode"></code>
+          <button id="copyRef" class="btn ghost small" type="button">Copy</button>
+        </div>
+        <label id="confirmRow" class="check" hidden>
+          <input type="checkbox" id="confirmLogin">
+          Tôi đã đăng ký và <b>đang đăng nhập</b> trang này trên trình duyệt này
+        </label>
+      </div>
+    </section>
+
+    <!-- Bước 3 -->
+    <section class="step" id="step3">
+      <div class="num">3</div>
+      <div class="content">
+        <h2>Nhập username nhận tiền</h2>
+        <p class="muted">Là <b>Tên đăng nhập</b> bạn đã đặt ở bước 2. Tiền hoàn sẽ về đúng tài khoản này.</p>
+        <form id="userForm" class="userform" autocomplete="off">
+          <input id="username" type="text" placeholder="vd: nguyenvana" spellcheck="false" required>
+          <button class="btn" type="submit">Lưu</button>
+        </form>
+        <p id="userMsg" class="msg"></p>
+        <p class="warn small">⚠ Gõ chính xác từng chữ. Sai username thì tiền có thể về tài khoản người khác hoặc không ai nhận.</p>
+      </div>
+    </section>
+
+    <!-- Bước 4 -->
+    <section class="step" id="step4">
+      <div class="num">4</div>
+      <div class="content">
+        <h2>Cho phép tiện ích hoạt động trên Shopee</h2>
+        <p class="muted">Tiện ích cần quyền đọc trang Shopee (để thêm nút) và trang hoàn tiền (để tự dán link). Tiện ích không đọc trang nào khác.</p>
+        <div class="actions">
+          <button id="permBtn" class="btn" type="button">Cấp quyền</button>
+          <span id="permMsg" class="msg"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bước 5 -->
+    <section class="step" id="step5">
+      <div class="num">5</div>
+      <div class="content">
+        <h2>Cách mua để được hoàn tiền</h2>
+        <ol class="howto">
+          <li>Mở sản phẩm muốn mua trên <b>shopee.vn</b>.</li>
+          <li>Bấm nút xanh ngay cạnh nút Mua Ngay:
+            <div class="demo">
+              <span class="demo-cart">Thêm Vào Giỏ Hàng</span>
+              <span class="demo-buy">Mua Ngay</span>
+              <span class="demo-cd">💰 Mua qua hoàn tiền</span>
+            </div>
+          </li>
+          <li>Chờ vài giây: tiện ích tự tạo link hoàn tiền rồi <b>tự mở lại sản phẩm</b>. Nút sẽ đổi thành
+            <span class="demo-ok">✓ Đã qua link hoàn tiền</span>.</li>
+          <li>Bấm <b>Mua Ngay</b> và đặt hàng như bình thường.</li>
+        </ol>
+        <div class="rules">
+          <b>Để không bị mất hoàn tiền:</b>
+          <ul>
+            <li>Đặt hàng ngay sau khi mở link, trên <b>chính trình duyệt này</b>. Không chuyển sang app Shopee trên điện thoại.</li>
+            <li>Sau khi bấm nút, đừng bấm vào link Shopee của người khác hoặc quảng cáo trước khi đặt hàng.</li>
+            <li>Mỗi sản phẩm (hoặc mỗi lần mua) nên bấm nút một lần.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq">
+      <h2>Câu hỏi thường gặp</h2>
+      <details>
+        <summary>Chưa đăng nhập trang hoàn tiền thì có dùng được không?</summary>
+        <p>Với TietKiem360: <b>được</b>. Tạo link chỉ cần username đúng. Bạn chỉ cần đăng nhập khi muốn xem đơn hàng hoặc rút tiền.
+        Với HoanTien.com: cần đăng nhập trên trình duyệt này, vì tiền vào ví của tài khoản đang đăng nhập.</p>
+      </details>
+      <details>
+        <summary>Chưa có username thì sao?</summary>
+        <p>Làm bước 2 để đăng ký (miễn phí). "Tên đăng nhập" bạn đặt khi đăng ký chính là username.</p>
+      </details>
+      <details>
+        <summary>Khi nào nhận được tiền? Xem ở đâu?</summary>
+        <p>Đơn được ghi nhận sau vài phút đến vài giờ. Tiền được duyệt sau khi đơn giao thành công và hết hạn đổi trả,
+        theo quy định của trang hoàn tiền. Đăng nhập trang hoàn tiền để xem đơn và rút tiền. Trong tiện ích, bấm vào icon ClickDeal để xem lịch sử các lần bấm mua.</p>
+      </details>
+      <details>
+        <summary>Muốn đổi username hoặc đổi trang hoàn tiền?</summary>
+        <p>Bấm icon ClickDeal trên thanh công cụ rồi sửa ở phần cài đặt. Hoặc mở lại trang này bằng nút "Hướng dẫn".</p>
+      </details>
+      <details>
+        <summary>Không thấy nút trên Shopee?</summary>
+        <p>Kiểm tra lại bước 4 (cấp quyền) rồi tải lại trang Shopee (F5). Nút chỉ hiện trên trang chi tiết sản phẩm, không hiện ở trang chủ hay trang tìm kiếm.</p>
+      </details>
+    </section>
+
+    <footer class="muted small">ClickDeal không thu thập dữ liệu. Lịch sử và cài đặt chỉ lưu trên máy bạn.</footer>
+  </div>
+
+  <script src="../config.js"></script>
+  <script src="setup.js"></script>
+</body>
+</html>

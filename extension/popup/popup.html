@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>ClickDeal</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="../icons/icon32.png" alt="" width="22" height="22">
+      <strong>ClickDeal</strong>
+      <span id="count" class="muted"></span>
+    </div>
+    <div class="tools">
+      <button id="guide" class="ghost" title="Mở trang hướng dẫn thiết lập">Hướng dẫn</button>
+      <button id="export" class="ghost" title="Tải lịch sử ra file CSV (mở bằng Excel)">Xuất CSV</button>
+      <button id="clear" class="ghost danger">Xoá hết</button>
+    </div>
+  </header>
+
+  <div id="setupWarn" class="setup-warn" hidden>
+    <span>⚠ Chưa thiết lập xong, nút mua qua hoàn tiền chưa dùng được.</span>
+    <button id="setupBtn">Thiết lập ngay</button>
+  </div>
+
+  <section class="settings">
+    <div class="row">
+      <label for="provider">Trang hoàn tiền</label>
+      <select id="provider"></select>
+    </div>
+    <div class="row" id="usernameRow">
+      <label for="username">Username nhận tiền</label>
+      <input id="username" type="text" placeholder="vd: phuclt093" autocomplete="off" spellcheck="false">
+    </div>
+    <label class="check">
+      <input type="checkbox" id="autoOpen">
+      Lấy được link xong thì tự mở link hoàn tiền để mua
+    </label>
+    <div id="saved" class="muted" hidden>Đã lưu cài đặt ✓</div>
+  </section>
+
+  <main id="list"></main>
+
+  <template id="row">
+    <article class="item">
+      <img class="thumb" alt="">
+      <div class="body">
+        <a class="name" target="_blank" rel="noopener"></a>
+        <div class="meta">
+          <span class="price"></span>
+          <span class="time muted"></span>
+          <span class="status"></span>
+        </div>
+        <div class="links">
+          <a class="aff" target="_blank" rel="noopener">Mở link hoàn tiền</a>
+          <button class="copy linkbtn">Copy link</button>
+          <a class="wallet" target="_blank" rel="noopener"></a>
+          <button class="del linkbtn danger">Xoá</button>
+        </div>
+        <div class="note muted"></div>
+        <form class="manual">
+          <input type="url" placeholder="Dán link hoàn tiền vào đây nếu tiện ích chưa tự lấy được" required>
+          <button type="submit">Lưu</button>
+        </form>
+      </div>
+    </article>
+  </template>
+
+  <script src="../config.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

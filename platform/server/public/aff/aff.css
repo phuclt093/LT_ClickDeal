@@ -1,0 +1,29 @@
+.wrap.wide { max-width: 920px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid var(--line); }
+.tab {
+  border: 0; background: none; color: var(--muted);
+  padding: 8px 12px; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tab.active { color: var(--fg); border-bottom-color: var(--green); }
+input[type=email], input[type=password], input[type=number] {
+  width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--bg); color: var(--fg); font-family: inherit; font-size: 16px;
+}
+.qr { display: flex; justify-content: center; margin: 10px 0; }
+.qr img { width: 220px; height: 220px; background: #fff; border-radius: 8px; padding: 6px; }
+.grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .grid { grid-template-columns: 1fr 1fr; } }
+.grid .card { margin-bottom: 0; }
+.grid + .card { margin-top: 14px; }
+.row.rate { align-items: flex-end; margin-top: 12px; }
+.row.rate .field { margin: 0; }
+.row.rate .btn { flex: none; }
+.table-wrap { overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl th, .tbl td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--line); white-space: nowrap; }
+.tbl th { color: var(--muted); font-weight: 600; border-top: 0; }
+.tbl .num { text-align: right; }
+.tbl .pay { display: flex; gap: 6px; }
+.tbl .pay input { width: 110px; padding: 6px 8px; font-size: 14px; }
+.who .btn { margin-left: 8px; }
