@@ -2,121 +2,150 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0f9d58">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f8f53">
   <meta name="robots" content="noindex">
   <title>ClickDeal cho affiliate</title>
   <link rel="icon" href="/icons/icon-192.png">
   <link rel="stylesheet" href="/app.css">
-  <link rel="stylesheet" href="/aff/aff.css">
 </head>
-<body>
-  <div class="wrap wide">
-    <header class="top">
-      <img src="/icons/icon-192.png" alt="">
-      <b>ClickDeal <span class="muted small">cho affiliate</span></b>
-      <div class="who"><span id="who"></span> <button class="btn ghost small" id="logoutBtn" type="button" hidden>Đăng xuất</button></div>
-    </header>
+<body class="aff">
+  <header class="topbar">
+    <div class="in">
+      <a class="brand" href="/aff/"><img src="/icons/icon-192.png" alt="">ClickDeal <small>affiliate</small></a>
+      <div class="who"><span id="who"></span><button class="btn ghost sm" id="logoutBtn" type="button">Đăng xuất</button></div>
+    </div>
+  </header>
 
-    <div class="card" id="loading"><div class="big-status"><div class="spinner"></div></div></div>
+  <main class="wrap wide">
+    <nav class="bottomnav n5" aria-label="Điều hướng">
+      <div class="in">
+        <button type="button" data-tab="todo"><span class="ic">✅</span>Việc cần làm<span class="dot" id="dotTodo" hidden></span></button>
+        <button type="button" data-tab="claims"><span class="ic">🧾</span>Đơn khách báo</button>
+        <button type="button" data-tab="pay"><span class="ic">💸</span>Trả tiền<span class="dot" id="dotPay" hidden></span></button>
+        <button type="button" data-tab="customers"><span class="ic">👥</span>Khách</button>
+        <button type="button" data-tab="settings"><span class="ic">⚙️</span>Cài đặt<span class="dot" id="dotSettings" hidden></span></button>
+      </div>
+    </nav>
 
-    <!-- Đăng nhập / đăng ký -->
-    <section id="auth" hidden>
+    <div class="note" id="pendingNote" hidden>Tài khoản đang chờ duyệt. Khách chưa đăng ký được cho tới khi được duyệt.</div>
+
+    <!-- ===== Việc cần làm ===== -->
+    <section id="tab-todo" hidden>
+      <div class="card" id="setupCard" hidden>
+        <h2>Bắt đầu trong 3 bước</h2>
+        <ul class="check-list" id="setupList"></ul>
+      </div>
+      <div id="reminders"></div>
+      <div class="stats four mt">
+        <button class="stat blue" type="button" data-go="claims:review"><b id="sReview">0</b><span>Đơn chờ duyệt</span></button>
+        <button class="stat" type="button" data-go="claims:due" id="sDueCard"><b id="sDue">0</b><span>Đến hạn kiểm tra</span></button>
+        <button class="stat green" type="button" data-go="pay"><b id="sOwed">0₫</b><span>Cần trả khách</span></button>
+        <button class="stat" type="button" data-go="claims:disputed" id="sDispCard"><b id="sDisputed">0</b><span>Đang khiếu nại</span></button>
+      </div>
+      <div class="card mt">
+        <div id="kpis"></div>
+      </div>
+      <div class="section-title">Đơn mới chờ duyệt</div>
+      <div class="card"><ul class="list" id="todoReview"></ul></div>
+      <div class="section-title" id="todoDispTitle" hidden>Đang khiếu nại</div>
+      <div class="card" id="todoDispCard" hidden><ul class="list" id="todoDisputed"></ul></div>
+    </section>
+
+    <!-- ===== Đơn khách báo ===== -->
+    <section id="tab-claims" hidden>
+      <div class="chips" id="claimChips"></div>
+      <div class="card"><ul class="list" id="claimList"></ul></div>
+    </section>
+
+    <!-- ===== Trả tiền ===== -->
+    <section id="tab-pay" hidden>
+      <div class="note info small">Đơn đã ghi nhận, gom theo khách. Đơn <b>đến hạn kiểm tra</b> được chọn sẵn: hãy vào AccessTrade xem đơn đã được duyệt chưa rồi mới trả. Bấm <b>Trả tiền</b> để hiện mã VietQR có sẵn số tiền và nội dung.</div>
+      <div id="payGroups"></div>
+    </section>
+
+    <!-- ===== Khách ===== -->
+    <section id="tab-customers" hidden>
       <div class="card">
-        <div class="tabs">
-          <button type="button" class="tab active" data-tab="login">Đăng nhập</button>
-          <button type="button" class="tab" data-tab="register">Đăng ký affiliate</button>
-        </div>
-        <form id="loginForm">
-          <label class="field"><span>Email</span><input type="email" id="lEmail" autocomplete="username" required></label>
-          <label class="field"><span>Mật khẩu</span><input type="password" id="lPass" autocomplete="current-password" required></label>
-          <label class="field"><span>Mã 2FA 6 số (nếu đã bật)</span><input type="text" id="lTotp" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
-          <div class="msg" id="loginMsg"></div>
-          <button class="btn" type="submit">Đăng nhập</button>
-        </form>
-        <form id="registerForm" hidden>
-          <label class="field"><span>Tên hiển thị với khách</span><input type="text" id="rName" maxlength="80" placeholder="vd: Phúc Deal" required></label>
-          <label class="field"><span>Mã affiliate (khách thấy trong link mời)</span><input type="text" id="rCode" maxlength="20" placeholder="vd: PHUC" autocapitalize="characters" required></label>
-          <label class="field"><span>Email</span><input type="email" id="rEmail" autocomplete="username" required></label>
-          <label class="field"><span>Mật khẩu (tối thiểu 10 ký tự)</span><input type="password" id="rPass" minlength="10" autocomplete="new-password" required></label>
-          <div class="msg" id="registerMsg"></div>
-          <button class="btn" type="submit">Tạo tài khoản</button>
-        </form>
+        <h2>Link mời khách</h2>
+        <p class="small muted">Gửi link này cho khách qua Zalo, Facebook… Khách mở link, tạo tài khoản bằng số điện thoại là xong.</p>
+        <div id="inviteBox"></div>
+        <button class="btn ghost sm mt" id="shareInvite" type="button" hidden>Chia sẻ link…</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Khách của bạn</h2><span class="muted small" id="custCount"></span></div>
+        <ul class="list" id="custList"></ul>
       </div>
     </section>
 
-    <!-- Bật 2FA -->
-    <section id="mfa" hidden>
+    <!-- ===== Cài đặt ===== -->
+    <section id="tab-settings" hidden>
       <div class="card">
-        <h1>Bật xác thực 2 lớp (bắt buộc)</h1>
-        <ol class="steps">
-          <li>Cài ứng dụng <b>Google Authenticator</b> hoặc <b>Microsoft Authenticator</b> trên điện thoại.</li>
-          <li>Quét mã QR dưới đây (hoặc nhập mã bí mật).</li>
-          <li>Nhập 6 số ứng dụng hiện ra rồi bấm Xác nhận.</li>
-        </ol>
-        <div class="qr"><img id="qrImg" alt="Mã QR 2FA"></div>
-        <code class="box" id="secretBox"></code>
-        <form id="mfaForm" class="row">
-          <input type="text" id="mfaCode" inputmode="numeric" maxlength="6" placeholder="6 số" required>
-          <button class="btn small" type="submit">Xác nhận</button>
+        <h2>1. Cổng nhận link (bắt buộc)</h2>
+        <p class="small muted">Địa chỉ trên tài khoản của bạn: nhận link Shopee và chuyển sang link affiliate của bạn (có mã khách). ClickDeal không giữ khóa API.</p>
+        <div class="note small" id="gwStatus"></div>
+        <form id="gwForm">
+          <label class="field"><span>Địa chỉ cổng</span>
+            <input type="url" id="gwInput" placeholder="https://clickdeal-gateway.ten-ban.workers.dev/go?url={url}&amp;sub={sub}&amp;click={click}" required>
+            <small>Bắt buộc có <code>{url}</code>. Nên có <code>{sub}</code> (mã khách) để biết đơn của ai.</small>
+          </label>
+          <div class="msg" id="gwMsg"></div>
+          <button class="btn" type="submit">Lưu cổng</button>
         </form>
-        <div class="msg" id="mfaMsg"></div>
+        <p class="small" id="gwTest" hidden>Mở thử: <a id="gwTestLink" target="_blank" rel="noopener">link ví dụ</a> — phải chuyển sang Shopee bằng link affiliate của bạn.</p>
+        <details class="mt small">
+          <summary>Cách tạo cổng miễn phí bằng Cloudflare Worker (khoảng 10 phút)</summary>
+          <ol class="steps">
+            <li>Đăng nhập dash.cloudflare.com → <b>Workers &amp; Pages</b> → <b>Create Worker</b>, đặt tên <code>clickdeal-gateway</code> → Deploy.</li>
+            <li><b>Edit code</b>: xóa code mẫu, dán nội dung file <code>platform/gateway/worker.js</code> → Deploy.</li>
+            <li><b>Settings → Variables and Secrets</b>: thêm <code>AT_ACCESS_KEY</code> (loại Secret, khóa API AccessTrade) và <code>AT_CAMPAIGN_ID</code> (mã campaign Shopee).</li>
+            <li>Mở địa chỉ Worker thấy <code>ClickDeal gateway OK</code> là được. Dán vào ô trên: <code>https://clickdeal-gateway.&lt;tên-bạn&gt;.workers.dev/go?url={url}&amp;sub={sub}&amp;click={click}</code></li>
+          </ol>
+        </details>
       </div>
-    </section>
 
-    <!-- Bảng điều khiển -->
-    <section id="dash" hidden>
-      <div class="note" id="pendingNote" hidden>Tài khoản đang chờ duyệt. Khách chưa tham gia được cho tới khi được duyệt.</div>
-
-      <div class="grid">
-        <div class="card">
-          <h2>1. Cổng nhận link</h2>
-          <p class="small muted">Địa chỉ trên tài khoản của bạn, nhận link Shopee và chuyển sang link affiliate của bạn. Dùng cổng mẫu Cloudflare/PHP trong thư mục <code>platform/gateway</code>, hoặc trang get link của bạn nếu nó nhận link qua địa chỉ.</p>
-          <p class="small" id="gwStatus"></p>
-          <form id="gwForm">
-            <input type="url" id="gwInput" placeholder="https://…/go?url={url}&amp;sub={sub}&amp;click={click}" required>
-            <div class="msg" id="gwMsg"></div>
-            <button class="btn" type="submit">Lưu cổng</button>
-          </form>
-          <p class="small" id="gwTest" hidden>Mở thử: <a id="gwTestLink" target="_blank" rel="noopener">link ví dụ</a>. Phải chuyển sang Shopee bằng link affiliate của bạn.</p>
-        </div>
-
-        <div class="card">
-          <h2>2. Link mời khách</h2>
-          <p class="small muted">Gửi link này cho khách (Zalo, Facebook…). Khách bấm vào là tham gia, không phải đăng ký gì.</p>
-          <code class="box" id="inviteBox"></code>
-          <div class="row">
-            <button class="btn small" id="copyInvite" type="button">Copy link mời</button>
-          </div>
-          <form id="rateForm" class="row rate">
-            <label class="field"><span>Tỉ lệ hoàn mặc định cho khách (%)</span>
+      <div class="card">
+        <h2>2. Hoàn tiền và nhắc trả</h2>
+        <form id="prefForm">
+          <div class="grid2">
+            <label class="field"><span>Tỉ lệ hoàn mặc định (%)</span>
               <input type="number" id="rateInput" min="0" max="100" step="1" required>
+              <small>% hoa hồng chia cho khách.</small>
             </label>
-            <button class="btn small" type="submit">Lưu</button>
-          </form>
-          <div class="msg" id="rateMsg"></div>
-        </div>
+            <label class="field"><span>Nhắc kiểm tra sau (ngày)</span>
+              <input type="number" id="remindInput" min="3" max="60" step="1" required>
+              <small>Tính từ lúc khách báo đơn.</small>
+            </label>
+          </div>
+          <div class="msg" id="prefMsg"></div>
+          <button class="btn" type="submit">Lưu</button>
+        </form>
       </div>
 
       <div class="card">
-        <h2>Khách của bạn <span class="muted small" id="custCount"></span></h2>
-        <div class="table-wrap">
-          <table class="tbl">
-            <thead><tr><th>Khách</th><th>Liên hệ</th><th>Mã khách</th><th class="num">Lượt bấm</th><th class="num">Đã trả</th><th></th></tr></thead>
-            <tbody id="custBody"></tbody>
-          </table>
-        </div>
-        <p class="small muted" id="custEmpty">Chưa có khách. Gửi link mời ở trên cho khách nhé.</p>
-        <p class="small muted">Đơn hàng xem trong tài khoản AccessTrade: mỗi đơn có <code>utm_content</code> bằng <b>mã khách</b>.</p>
+        <h2>3. Tự đối chiếu AccessTrade (tùy chọn)</h2>
+        <p class="small muted">Bật lên thì ClickDeal lấy danh sách đơn từ AccessTrade mỗi 20 phút để gợi ý khi bạn duyệt (đơn có khớp mã không, hoa hồng bao nhiêu). Không bật vẫn dùng bình thường. Khóa API được mã hóa, không bao giờ hiện lại.</p>
+        <label class="check"><input type="checkbox" id="syncToggle"><span>Bật tự đối chiếu</span></label>
+        <form id="credForm" hidden>
+          <p class="small" id="credStatus"></p>
+          <div class="grid2">
+            <label class="field"><span>Khóa API AccessTrade</span><input type="password" id="atKey" autocomplete="off" required></label>
+            <label class="field"><span>Campaign ID Shopee</span><input id="atCamp" inputmode="numeric" required></label>
+          </div>
+          <div class="msg" id="credMsg"></div>
+          <div class="btn-row">
+            <button class="btn" type="submit">Lưu và kiểm tra khóa</button>
+            <button class="btn ghost" type="button" id="syncNow">Đồng bộ ngay</button>
+          </div>
+        </form>
       </div>
 
-      <div class="card">
-        <h2>Lượt bấm mua gần đây</h2>
-        <ul class="list" id="linkList"></ul>
-        <p class="small muted" id="linkEmpty">Chưa có lượt nào.</p>
+      <div class="card flat">
+        <p class="small mb0">ClickDeal là công cụ kỹ thuật, không giữ tiền và không phân xử. Bạn tự chịu trách nhiệm trả tiền hoàn cho khách theo cam kết của mình. <a href="/terms" target="_blank" rel="noopener">Điều khoản sử dụng</a></p>
       </div>
     </section>
-  </div>
+  </main>
+  <script src="/common.js"></script>
   <script src="/aff/aff.js"></script>
 </body>
 </html>

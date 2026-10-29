@@ -1,4 +1,7 @@
 /**
+ * TÙY CHỌN (tắt mặc định): affiliate bật "tự đối chiếu" thì worker lấy đơn từ AccessTrade
+ * để gợi ý khi duyệt báo đơn. Luồng chính không phụ thuộc phần này.
+ *
  * Đồng bộ đơn hàng từ mạng affiliate về bảng orders, ghép với khách qua ref_code (utm_content).
  * Tôn trọng giới hạn tần suất: mỗi khóa cách nhau tối thiểu networkMinIntervalMs giữa 2 lần gọi.
  */
@@ -58,7 +61,11 @@ export async function syncAffiliate(deps: Deps, affiliateId: string, opts: { day
 
 export async function syncAll(deps: Deps, log: (m: string) => void = console.log) {
   const ids = await deps.db.tx({ system: true }, async (q) =>
-    (await q.query<{ id: string }>("SELECT id FROM affiliates WHERE status = 'active' ORDER BY last_synced_at NULLS FIRST")).rows.map((r) => r.id)
+    (
+      await q.query<{ id: string }>(
+        "SELECT id FROM affiliates WHERE status = 'active' AND order_sync_enabled ORDER BY last_synced_at NULLS FIRST"
+      )
+    ).rows.map((r) => r.id)
   );
   for (const id of ids) {
     try {

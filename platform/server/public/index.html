@@ -3,100 +3,142 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f9d58">
-  <title>ClickDeal</title>
+  <meta name="theme-color" content="#0f8f53">
+  <meta name="robots" content="noindex">
+  <title>ClickDeal — Đăng nhập</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/icons/icon-192.png">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="stylesheet" href="/app.css">
 </head>
-<body data-page="home">
-  <div class="wrap">
-    <header class="top">
+<body>
+  <main class="auth-wrap">
+    <div class="auth-brand">
       <img src="/icons/icon-192.png" alt="">
       <b>ClickDeal</b>
-      <div class="who" id="who"></div>
-    </header>
+      <span class="muted small">Mua Shopee qua link hoàn tiền của người giới thiệu</span>
+    </div>
 
-    <!-- Chưa tham gia -->
-    <section id="notJoined" hidden>
-      <div class="card">
-        <h1>Mua Shopee, nhận lại tiền</h1>
-        <p class="muted">Bạn cần <b>link mời</b> từ người giới thiệu (affiliate) để bắt đầu. Có mã mời thì nhập vào đây:</p>
-        <form id="codeForm" class="row">
-          <input type="text" id="codeInput" placeholder="Mã mời, vd: PHUC" autocomplete="off" autocapitalize="characters" required>
-          <button class="btn small" type="submit">Tiếp tục</button>
-        </form>
+    <div class="card big-status" id="loading"><div class="spinner"></div></div>
+
+    <!-- Link mời: affiliate nào mời, chỉ số uy tín -->
+    <div class="card" id="inviter" hidden>
+      <div class="inviter">
+        <div class="av" id="invAv"></div>
+        <div>
+          <b id="invName"></b> mời bạn mua Shopee nhận hoàn tiền
+          <div class="small muted">Hoàn khoảng <b id="invRate"></b> hoa hồng mỗi đơn, do <span id="invName2"></span> chuyển cho bạn.</div>
+        </div>
       </div>
+      <div class="rep">
+        <div><b id="repPaid">0</b><span>đơn đã trả</span></div>
+        <div><b id="repDays">—</b><span>ngày trả trung bình</span></div>
+        <div><b id="repDispute">0%</b><span>đơn bị khiếu nại</span></div>
+      </div>
+    </div>
+    <div class="card" id="badInvite" hidden>
+      <h2>Link mời không dùng được</h2>
+      <p class="muted small" id="badInviteMsg"></p>
+    </div>
+
+    <!-- Đã đăng nhập mà mở link mời -->
+    <div class="card" id="already" hidden>
+      <h2>Bạn đang đăng nhập</h2>
+      <p class="muted" id="alreadyMsg"></p>
+      <div class="btn-row">
+        <a class="btn" id="alreadyGo" href="/app/">Mở ClickDeal</a>
+        <button class="btn ghost" id="alreadyOut" type="button">Đăng xuất</button>
+      </div>
+    </div>
+
+    <section class="card" id="auth" hidden>
+      <div class="seg" role="tablist" aria-label="Vai trò">
+        <button type="button" data-role="buyer" class="on">🛒 Người mua<small>Mua hàng, nhận hoàn tiền</small></button>
+        <button type="button" data-role="affiliate">💼 Affiliate<small>Chia hoa hồng cho khách</small></button>
+      </div>
+      <div class="tabs">
+        <button type="button" data-mode="login" class="on">Đăng nhập</button>
+        <button type="button" data-mode="register">Tạo tài khoản</button>
+      </div>
+
+      <form id="loginForm" autocomplete="on">
+        <label class="field"><span id="loginLabel">Số điện thoại</span>
+          <input id="lLogin" required autocomplete="username">
+        </label>
+        <label class="field"><span>Mật khẩu</span>
+          <input type="password" id="lPass" required autocomplete="current-password">
+        </label>
+        <label class="field" id="totpField" hidden><span>Mã xác thực 2 lớp (6 số)</span>
+          <input id="lTotp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}">
+        </label>
+        <div class="msg" id="loginMsg"></div>
+        <button class="btn block" type="submit">Đăng nhập</button>
+        <p class="tiny muted center" id="forgotHint">Quên mật khẩu? Liên hệ người đã mời bạn để được hỗ trợ.</p>
+      </form>
+
+      <form id="regBuyer" hidden>
+        <label class="field" id="inviteField"><span>Mã mời của người giới thiệu</span>
+          <input id="bInvite" maxlength="20" placeholder="vd: PHUC" autocapitalize="characters" autocomplete="off">
+          <small>Không có mã? Hỏi người đã giới thiệu ClickDeal cho bạn.</small>
+        </label>
+        <label class="field"><span>Tên của bạn</span>
+          <input id="bName" maxlength="40" placeholder="vd: Lan" required autocomplete="name">
+        </label>
+        <label class="field"><span>Số điện thoại (dùng để đăng nhập)</span>
+          <input type="tel" id="bPhone" maxlength="16" placeholder="09xx xxx xxx" required autocomplete="tel">
+        </label>
+        <label class="field"><span>Mật khẩu (tối thiểu 8 ký tự)</span>
+          <input type="password" id="bPass" minlength="8" required autocomplete="new-password">
+        </label>
+        <label class="check"><input type="checkbox" id="bTerms" required>
+          <span>Tôi đã đọc và đồng ý <a href="/terms" target="_blank" rel="noopener">Điều khoản sử dụng &amp; miễn trừ trách nhiệm</a>.</span>
+        </label>
+        <div class="msg" id="bMsg"></div>
+        <button class="btn block" type="submit">Tạo tài khoản người mua</button>
+      </form>
+
+      <form id="regAff" hidden>
+        <label class="field"><span>Tên hiển thị với khách</span>
+          <input id="aName" maxlength="80" placeholder="vd: Phúc Deal" required>
+        </label>
+        <label class="field"><span>Mã mời (khách nhập mã này hoặc mở link mời)</span>
+          <input id="aCode" maxlength="20" placeholder="vd: PHUC" autocapitalize="characters" required>
+          <small>3–20 chữ cái không dấu hoặc số.</small>
+        </label>
+        <label class="field"><span>Email</span>
+          <input type="email" id="aEmail" required autocomplete="username">
+        </label>
+        <label class="field"><span>Mật khẩu (tối thiểu 10 ký tự)</span>
+          <input type="password" id="aPass" minlength="10" required autocomplete="new-password">
+        </label>
+        <label class="check"><input type="checkbox" id="aTerms" required>
+          <span>Tôi đã đọc và đồng ý <a href="/terms" target="_blank" rel="noopener">Điều khoản sử dụng &amp; miễn trừ trách nhiệm</a>, tự chịu trách nhiệm trả tiền hoàn cho khách của mình.</span>
+        </label>
+        <div class="msg" id="aMsg"></div>
+        <button class="btn block" type="submit">Tạo tài khoản affiliate</button>
+      </form>
     </section>
 
-    <!-- Đã tham gia -->
-    <section id="joined" hidden>
-      <div class="card">
-        <h2>Tiền hoàn của bạn</h2>
-        <div class="totals">
-          <div><b id="tPending">0₫</b><span>Chờ duyệt</span></div>
-          <div class="owed"><b id="tOwed">0₫</b><span>Được nhận</span></div>
-          <div><b id="tPaid">0₫</b><span>Đã nhận</span></div>
-        </div>
-        <p class="small muted" id="rateLine"></p>
-      </div>
-
-      <div class="card">
-        <h2>Dán link sản phẩm Shopee</h2>
-        <form id="pasteForm">
-          <input type="url" id="pasteInput" placeholder="https://s.shopee.vn/..." required>
-          <div class="msg" id="pasteMsg"></div>
-          <button class="btn" type="submit">Mở bằng link hoàn tiền</button>
-        </form>
-      </div>
-
-      <div class="card" id="installCard">
-        <h2>Nhanh nhất: chia sẻ thẳng từ app Shopee</h2>
-        <div id="androidGuide">
-          <ol class="steps">
-            <li>Bấm nút dưới để <b>cài ClickDeal lên màn hình chính</b> (1 lần).</li>
-            <li>Trong app Shopee, mở sản phẩm → bấm <b>Chia sẻ</b> → chọn <b>ClickDeal</b>.</li>
-            <li>ClickDeal tự mở lại sản phẩm qua link hoàn tiền. Bấm <b>Mua ngay</b> như bình thường.</li>
-          </ol>
-          <button class="btn" id="installBtn" type="button" hidden>Cài ClickDeal lên màn hình chính</button>
-          <p class="small muted" id="installHint">Nếu không thấy nút cài: mở menu ⋮ của Chrome → "Thêm vào Màn hình chính".</p>
-        </div>
-        <div id="iosGuide" hidden>
-          <p>Trên iPhone, dùng <b>Phím tắt</b> (Shortcuts) để ClickDeal hiện trong menu Chia sẻ:</p>
-          <ol class="steps">
-            <li>Mở app <b>Phím tắt</b> → bấm <b>+</b> → đặt tên <b>ClickDeal</b>.</li>
-            <li>Bấm ⓘ → bật <b>Hiển thị trong Bảng chia sẻ</b>, nhận <b>URL và Văn bản</b>.</li>
-            <li>Thêm tác vụ <b>Mở URL</b>, dán địa chỉ dưới rồi chèn biến <b>Đầu vào phím tắt</b> vào cuối:</li>
-          </ol>
-          <code class="box" id="shortcutUrl"></code>
-          <button class="btn ghost small" id="copyShortcut" type="button">Copy địa chỉ</button>
-          <p class="small muted">Sau đó trong app Shopee: <b>Chia sẻ</b> → <b>ClickDeal</b>. Lưu ý: tham gia bằng link mời trong <b>Safari</b> để Phím tắt dùng được.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Đơn hàng</h2>
-        <ul class="list" id="orders"></ul>
-        <p class="small muted" id="ordersEmpty">Chưa có đơn nào. Đơn thường hiện sau vài phút đến vài giờ kể từ lúc đặt.</p>
-      </div>
-
-      <div class="card">
-        <h2>Sản phẩm đã mở gần đây</h2>
-        <ul class="list" id="links"></ul>
-        <p class="small muted" id="linksEmpty">Chưa có.</p>
-      </div>
-
-      <div class="card">
-        <h2>Tiện ích trên máy tính</h2>
-        <p class="small muted">Dùng Chrome/Firefox trên máy tính? Cài tiện ích ClickDeal rồi dán mã kết nối này vào phần cài đặt của tiện ích:</p>
-        <button class="btn ghost small" id="showToken" type="button">Hiện mã kết nối</button>
-        <code class="box" id="tokenBox" hidden></code>
-        <p class="small muted">Không chia sẻ mã này cho người khác.</p>
-        <button class="btn ghost small" id="leaveBtn" type="button">Xóa dữ liệu của tôi và thoát</button>
-      </div>
+    <!-- Affiliate: bật 2FA -->
+    <section class="card" id="mfa" hidden>
+      <h2>Bật xác thực 2 lớp (bắt buộc với affiliate)</h2>
+      <ol class="steps small">
+        <li>Cài <b>Google Authenticator</b> hoặc <b>Microsoft Authenticator</b> trên điện thoại.</li>
+        <li>Quét mã QR dưới đây (hoặc nhập mã bí mật).</li>
+        <li>Nhập 6 số ứng dụng hiện ra rồi bấm Xác nhận.</li>
+      </ol>
+      <div class="qr"><img id="qrImg" alt="Mã QR 2FA"></div>
+      <code class="box" id="secretBox"></code>
+      <form id="mfaForm" class="inline mt">
+        <input id="mfaCode" inputmode="numeric" maxlength="6" placeholder="6 số" required>
+        <button class="btn" type="submit">Xác nhận</button>
+      </form>
+      <div class="msg" id="mfaMsg"></div>
     </section>
-  </div>
-  <script src="/app.js"></script>
+
+    <p class="legal">ClickDeal là công cụ kỹ thuật, không giữ tiền và không phân xử tranh chấp. <a href="/terms">Điều khoản</a></p>
+  </main>
+  <script src="/common.js"></script>
+  <script src="/login.js"></script>
 </body>
 </html>

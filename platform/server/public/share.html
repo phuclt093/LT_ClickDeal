@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f9d58">
+  <meta name="theme-color" content="#0f8f53">
   <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
   <title>Đang mở link hoàn tiền…</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="/app.css">
 </head>
-<body data-page="share">
-  <div class="wrap">
+<body>
+  <main class="auth-wrap">
     <div class="card big-status" id="working">
       <div class="spinner"></div>
       <h2>Đang tạo link hoàn tiền…</h2>
@@ -19,13 +20,14 @@
     <div class="card" id="failed" hidden>
       <h2>Chưa tạo được link hoàn tiền</h2>
       <p class="msg err" id="failMsg"></p>
-      <button class="btn" id="retryBtn" type="button">Thử lại</button>
-      <p></p>
-      <a class="btn ghost" id="plainLink" hidden>Mở sản phẩm (không hoàn tiền)</a>
-      <p></p>
-      <a class="btn ghost" href="/">Về ClickDeal</a>
+      <div class="btn-row">
+        <button class="btn" id="retryBtn" type="button">Thử lại</button>
+        <a class="btn ghost" href="/app/">Về ClickDeal</a>
+      </div>
+      <a class="btn ghost block mt" id="plainLink" hidden>Mở sản phẩm (không hoàn tiền)</a>
     </div>
-  </div>
-  <script src="/app.js"></script>
+  </main>
+  <script src="/common.js"></script>
+  <script src="/share.js"></script>
 </body>
 </html>

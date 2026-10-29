@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f8f53">
+  <meta name="robots" content="noindex">
+  <title>ClickDeal</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body class="buyer">
+  <header class="topbar narrow">
+    <div class="in">
+      <a class="brand" href="/app/"><img src="/icons/icon-192.png" alt="">ClickDeal</a>
+      <div class="who"><span id="who"></span></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="note ok" id="welcome" hidden>
+      <b>Tạo tài khoản thành công!</b> Bước tiếp theo: cài ClickDeal lên màn hình chính (bên dưới), rồi vào <b>Tài khoản</b> thêm ngân hàng để nhận tiền.
+    </div>
+
+    <!-- ===== Mua ===== -->
+    <section id="tab-buy" hidden>
+      <div class="card">
+        <h2>Mở sản phẩm qua link hoàn tiền</h2>
+        <form id="pasteForm">
+          <input type="url" id="pasteInput" placeholder="Dán link sản phẩm Shopee" required>
+          <div class="msg" id="pasteMsg"></div>
+          <button class="btn block mt" type="submit">Mở bằng link hoàn tiền</button>
+        </form>
+        <p class="tiny muted mb0">Shopee mở lại sản phẩm, bạn mua như bình thường. Đặt xong nhớ <b>Báo đơn</b> để được hoàn tiền.</p>
+      </div>
+
+      <div class="card" id="installCard">
+        <h2>Nhanh nhất: chia sẻ thẳng từ app Shopee</h2>
+        <div id="androidGuide">
+          <ol class="steps small">
+            <li>Cài <b>ClickDeal lên màn hình chính</b> (1 lần).</li>
+            <li>Trong app Shopee: mở sản phẩm → <b>Chia sẻ</b> → chọn <b>ClickDeal</b>.</li>
+            <li>ClickDeal tự mở lại sản phẩm qua link hoàn tiền. Bấm <b>Mua ngay</b> như bình thường.</li>
+          </ol>
+          <button class="btn block" id="installBtn" type="button" hidden>Cài ClickDeal lên màn hình chính</button>
+          <p class="tiny muted mb0" id="installHint">Không thấy nút cài? Mở menu ⋮ của Chrome → "Thêm vào Màn hình chính".</p>
+        </div>
+        <div id="iosGuide" hidden>
+          <p class="small">Trên iPhone, dùng app <b>Phím tắt</b> để ClickDeal hiện trong menu Chia sẻ:</p>
+          <ol class="steps small">
+            <li>Mở <b>Phím tắt</b> → <b>+</b> → đặt tên <b>ClickDeal</b>.</li>
+            <li>Bấm ⓘ → bật <b>Hiển thị trong Bảng chia sẻ</b>, nhận <b>URL và Văn bản</b>.</li>
+            <li>Thêm tác vụ <b>Mở URL</b>, dán địa chỉ dưới đây rồi chèn biến <b>Đầu vào phím tắt</b> vào cuối.</li>
+          </ol>
+          <div id="shortcutBox"></div>
+          <p class="tiny muted mb0">Đăng nhập ClickDeal trong <b>Safari</b> để Phím tắt dùng được.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Sản phẩm đã mở gần đây</h2></div>
+        <ul class="list" id="links"></ul>
+      </div>
+
+      <div class="card flat">
+        <h3>Cách nhận hoàn tiền</h3>
+        <ol class="steps small mb0">
+          <li>Mở sản phẩm qua ClickDeal rồi đặt hàng trên Shopee.</li>
+          <li>Vào <b>Đơn của tôi</b> → <b>Báo đơn</b>: nhập mã đơn Shopee, kèm ảnh chụp đơn.</li>
+          <li>Người giới thiệu đối chiếu và ghi nhận. Tiền được trả sau khi đơn hoàn tất trên Shopee (thường 2–6 tuần).</li>
+          <li>Nhận tiền vào tài khoản ngân hàng, bấm <b>Đã nhận tiền</b>.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===== Đơn của tôi ===== -->
+    <section id="tab-orders" hidden>
+      <div class="stats three">
+        <div class="stat"><b id="tWaiting">0₫</b><span>Chờ trả</span></div>
+        <div class="stat"><b id="tPaid">0₫</b><span>Đã báo trả</span></div>
+        <div class="stat green"><b id="tReceived">0₫</b><span>Đã nhận</span></div>
+      </div>
+      <button class="btn block mt" id="newClaimBtn" type="button">＋ Báo đơn đã mua</button>
+      <div class="card mt">
+        <ul class="list" id="claims"></ul>
+      </div>
+    </section>
+
+    <!-- ===== Tài khoản ===== -->
+    <section id="tab-account" hidden>
+      <div class="card">
+        <h2>Thông tin</h2>
+        <div id="profile"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Tài khoản nhận tiền</h2></div>
+        <p class="small muted">Người giới thiệu dùng thông tin này để chuyển tiền hoàn cho bạn (quét mã VietQR). Thông tin được mã hóa, chỉ bạn và người giới thiệu xem được.</p>
+        <form id="bankForm">
+          <label class="field"><span>Ngân hàng</span><select id="bankBin" required><option value="">Chọn ngân hàng…</option></select></label>
+          <label class="field"><span>Số tài khoản</span><input id="bankAcc" inputmode="numeric" maxlength="19" required></label>
+          <label class="field"><span>Tên chủ tài khoản</span><input id="bankHolder" maxlength="60" placeholder="NGUYEN THI LAN" autocapitalize="characters" required></label>
+          <div class="msg" id="bankMsg"></div>
+          <button class="btn block" type="submit">Lưu tài khoản nhận tiền</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Tiện ích trên máy tính</h2>
+        <p class="small muted">Dùng Chrome/Firefox trên máy tính? Tạo mã kết nối rồi dán vào phần cài đặt của tiện ích ClickDeal. Tạo mã mới thì mã cũ hết hiệu lực.</p>
+        <div id="extKeyBox"></div>
+        <div class="btn-row">
+          <button class="btn ghost sm" id="extKeyBtn" type="button">Tạo mã kết nối</button>
+          <button class="btn ghost sm" id="extKeyOff" type="button" hidden>Tắt mã hiện tại</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="btn-row">
+          <a class="btn ghost" href="/terms">Điều khoản</a>
+          <button class="btn ghost" id="logoutBtn" type="button">Đăng xuất</button>
+        </div>
+        <button class="btn danger ghost block mt" id="deleteBtn" type="button">Xóa tài khoản của tôi</button>
+        <p class="tiny muted mb0">Xóa tài khoản sẽ xóa tên, số điện thoại, ngân hàng. Lịch sử báo đơn và trao đổi vẫn được lưu theo Điều khoản để đối soát.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottomnav" aria-label="Điều hướng">
+    <div class="in">
+      <button type="button" data-tab="buy"><span class="ic">🛍️</span>Mua</button>
+      <button type="button" data-tab="orders"><span class="ic">🧾</span>Đơn của tôi<span class="dot" id="dotOrders" hidden></span></button>
+      <button type="button" data-tab="account"><span class="ic">👤</span>Tài khoản<span class="dot" id="dotAccount" hidden></span></button>
+    </div>
+  </nav>
+  <script src="/common.js"></script>
+  <script src="/app/buyer.js"></script>
+</body>
+</html>

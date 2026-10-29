@@ -48,18 +48,19 @@ Cuối cùng script in ra địa chỉ, ví dụ `https://abc-xyz.trycloudflare.
 
 ## Bước 3: tạo tài khoản affiliate
 
-1. Mở `https://<địa-chỉ>/aff/` → **Đăng ký affiliate**.
+1. Mở `https://<địa-chỉ>/` → chọn **Affiliate** → **Tạo tài khoản**.
 2. Bật 2FA: quét mã QR bằng Google Authenticator hoặc Microsoft Authenticator.
-3. Ở mục **Cổng nhận link**, dán địa chỉ cổng Cloudflare Worker của bạn (xem `platform/gateway/README.md`). Bước này cần tài khoản publisher AccessTrade.
-4. Copy **link mời**, gửi cho chính bạn qua Zalo để thử vai người mua.
+3. Vào tab **Cài đặt** → **Cổng nhận link**, dán địa chỉ cổng Cloudflare Worker của bạn (xem `platform/gateway/README.md`). Bước này cần tài khoản publisher AccessTrade.
+4. Tab **Khách** → copy **link mời**, gửi cho chính bạn qua Zalo để thử vai người mua.
 
 ## Bước 4: thử vai người mua trên điện thoại
 
-1. Mở link mời trên điện thoại → nhập tên → **Tham gia**.
+1. Mở link mời trên điện thoại → nhập tên, số điện thoại, mật khẩu → **Tạo tài khoản người mua**. Vào **Tài khoản** thêm ngân hàng nhận tiền.
    - **Android (Chrome):** cài ClickDeal lên màn hình chính khi được hỏi, hoặc vào menu ⋮ → "Thêm vào Màn hình chính".
    - **iPhone:** mở link mời bằng **Safari**, rồi làm theo hướng dẫn Phím tắt hiện trên trang chủ ClickDeal.
 2. Mở app Shopee → chọn sản phẩm → **Chia sẻ** → **ClickDeal**. Shopee sẽ mở lại sản phẩm qua link hoàn tiền.
-3. Quay lại trang `/aff/` để thấy lượt bấm. Đặt thử một đơn nhỏ, rồi xem trong tài khoản AccessTrade: đơn có `utm_content` bằng mã khách là thành công.
+3. Đặt thử một đơn nhỏ → trong ClickDeal vào **Đơn của tôi** → **Báo đơn** (mã đơn Shopee + ảnh chụp).
+4. Đăng nhập vai trò affiliate → **Việc cần làm** thấy đơn mới → đối chiếu trên AccessTrade (đơn có `utm_content` bằng mã khách) → **Ghi nhận** → tab **Trả tiền** quét VietQR.
 
 ## Lệnh hay dùng
 

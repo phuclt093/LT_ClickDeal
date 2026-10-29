@@ -13,6 +13,7 @@ import { authRoutes } from "./routes/auth.js";
 import { extRoutes } from "./routes/ext.js";
 import { affRoutes } from "./routes/aff.js";
 import { adminRoutes } from "./routes/admin.js";
+import { fileRoutes } from "./routes/files.js";
 import { baseUrl } from "./routes/util.js";
 
 const PUBLIC_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../public");
@@ -33,7 +34,10 @@ export async function buildApp(deps: Deps, opts: { logger?: boolean } = {}): Pro
               "body.accessKey",
               "body.secret",
               "body.totp",
-              "body.contact"
+              "body.contact",
+              "body.image",
+              "body.receipt",
+              "body.account"
             ],
             censor: "[ẩn]"
           }
@@ -61,11 +65,13 @@ export async function buildApp(deps: Deps, opts: { logger?: boolean } = {}): Pro
   await app.register(cookie);
   await app.register(rateLimit, { global: true, max: 300, timeWindow: "1 minute" });
 
-  // Chống CSRF cho các API dùng cookie: yêu cầu JSON + Origin đúng tên miền
+  // Chống CSRF cho các API dùng cookie: yêu cầu JSON + Origin đúng tên miền.
+  // Tiện ích trình duyệt gửi mã kết nối qua header Authorization (không dùng cookie) nên không cần kiểm tra Origin.
   app.addHook("onRequest", async (req) => {
     const m = req.method;
     if (m === "GET" || m === "HEAD" || m === "OPTIONS") return;
-    if (!req.url.startsWith("/v1/auth") && !req.url.startsWith("/v1/aff") && !req.url.startsWith("/v1/admin")) return;
+    if (!req.url.startsWith("/v1/")) return;
+    if (/^Bearer cdk_/.test(String(req.headers.authorization || ""))) return;
     const origin = req.headers.origin;
     if (origin && origin !== baseUrl(deps, req)) throw new AppError("Nguồn yêu cầu không hợp lệ", 403);
     const ct = String(req.headers["content-type"] || "");
@@ -92,11 +98,14 @@ export async function buildApp(deps: Deps, opts: { logger?: boolean } = {}): Pro
   extRoutes(app, deps);
   affRoutes(app, deps);
   adminRoutes(app, deps);
+  fileRoutes(app, deps);
 
-  // PWA cho người mua: trang chủ, link mời /j/<mã>, nhận link chia sẻ /share
+  // Trang web: / đăng nhập chung (2 vai trò), /app/ người mua, /aff/ affiliate,
+  // /j/<mã> đăng ký người mua bằng link mời, /share nhận link chia sẻ từ app Shopee, /terms điều khoản
   await app.register(fastifyStatic, { root: PUBLIC_DIR, prefix: "/", index: ["index.html"], redirect: true });
-  app.get("/j/:code", (req, reply) => reply.type("text/html").sendFile("join.html"));
+  app.get("/j/:code", (req, reply) => reply.type("text/html").sendFile("index.html"));
   app.get("/share", (req, reply) => reply.type("text/html").sendFile("share.html"));
+  app.get("/terms", (req, reply) => reply.type("text/html").sendFile("terms.html"));
 
   return app;
 }
