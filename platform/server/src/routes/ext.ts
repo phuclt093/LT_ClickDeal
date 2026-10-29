@@ -128,6 +128,16 @@ export function extRoutes(app: FastifyInstance, deps: Deps) {
 
   app.get("/v1/public/banks", async () => BANKS);
 
+  // Trang đăng nhập cần biết: không có mã mời thì có đăng ký được không (affiliate mặc định)
+  app.get("/v1/public/signup-info", async () => {
+    const code = deps.config.defaultInviteCode;
+    if (!code) return { defaultAffiliate: null };
+    const a: any = (
+      await deps.db.tx({ system: true }, (q) => q.query("SELECT display_name, status FROM affiliates WHERE code = $1", [code]))
+    ).rows[0];
+    return { defaultAffiliate: a && a.status === "active" ? { displayName: a.display_name } : null };
+  });
+
   app.get("/v1/ext/me", guard, async (req) =>
     scoped(req, async (q, c) => {
       const a: any = (

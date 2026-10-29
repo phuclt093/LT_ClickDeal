@@ -143,6 +143,13 @@
     );
   }
 
+  // Server có affiliate mặc định → mã mời không bắt buộc
+  CD.api("GET", "/v1/public/signup-info").then(function (r) {
+    if (!r.defaultAffiliate) return;
+    $("inviteLabel").textContent = "Mã mời (không bắt buộc)";
+    $("inviteHint").textContent = "Để trống: bạn nhận hoàn tiền qua " + r.defaultAffiliate.displayName + ".";
+  }).catch(function () {});
+
   // Khởi động: đã đăng nhập thì chuyển thẳng vào ứng dụng
   CD.api("GET", "/v1/auth/me").then(
     function (me) {

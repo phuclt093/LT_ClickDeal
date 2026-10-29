@@ -67,7 +67,8 @@ const Phone = z.string().transform((s, ctx) => {
 });
 
 const RegisterBuyerBody = z.object({
-  inviteCode: z.string().trim().toUpperCase().regex(/^[A-Z0-9]{3,20}$/, "Mã mời không hợp lệ"),
+  // để trống → gắn vào affiliate mặc định (DEFAULT_INVITE_CODE) nếu server có cài
+  inviteCode: z.string().trim().toUpperCase().regex(/^([A-Z0-9]{3,20})?$/, "Mã mời không hợp lệ").default(""),
   name: z.string().trim().min(1, "Nhập tên của bạn").max(40),
   phone: Phone,
   password: z.string().min(8, "Mật khẩu tối thiểu 8 ký tự").max(200),
@@ -174,9 +175,16 @@ export function authRoutes(app: FastifyInstance, deps: Deps) {
   app.post("/v1/auth/register-buyer", strict, async (req, reply) => {
     const b = RegisterBuyerBody.parse(req.body);
     const hash = await argon2.hash(b.password, { type: argon2.argon2id });
+    const code = b.inviteCode || deps.config.defaultInviteCode;
+    if (!code) throw new AppError("Cần mã mời của người giới thiệu (hỏi người đã gửi ClickDeal cho bạn)");
     const out = await deps.db.tx({ system: true }, async (q) => {
-      const a: any = (await q.query("SELECT id, display_name, status FROM affiliates WHERE code = $1", [b.inviteCode])).rows[0];
-      if (!a || a.status !== "active") throw new AppError("Mã mời không đúng hoặc affiliate chưa hoạt động", 404);
+      const a: any = (await q.query("SELECT id, display_name, status FROM affiliates WHERE code = $1", [code])).rows[0];
+      if (!a || a.status !== "active") {
+        throw new AppError(
+          b.inviteCode ? `Không có affiliate nào dùng mã mời ${code} (hoặc đang tạm ngưng)` : "Chưa có người giới thiệu mặc định, hãy nhập mã mời",
+          404
+        );
+      }
       const dup = await q.query("SELECT 1 FROM users WHERE phone = $1", [b.phone]);
       if (dup.rows.length) throw new AppError("Số điện thoại này đã có tài khoản, hãy đăng nhập", 409);
       const u = await q.query<{ id: string }>(
@@ -191,7 +199,7 @@ export function authRoutes(app: FastifyInstance, deps: Deps) {
         [a.id, refCode, b.name, contactEnc, u.rows[0].id]
       );
       await audit(q, { affiliateId: a.id, actorUserId: u.rows[0].id, action: "buyer.register", ip: req.ip });
-      return { userId: u.rows[0].id, affiliate: { code: b.inviteCode, displayName: a.display_name } };
+      return { userId: u.rows[0].id, affiliate: { code, displayName: a.display_name } };
     });
     await startSession(deps, reply, req, out.userId, false, "buyer");
     return { ok: true, role: "buyer", affiliate: out.affiliate };

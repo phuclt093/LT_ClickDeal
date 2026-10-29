@@ -195,6 +195,19 @@ test("người mua đăng ký bằng mã mời + số điện thoại, đăng nh
   refCode = res.json().refCode;
 });
 
+test("đăng ký không có mã mời: bắt buộc mã, trừ khi server cài affiliate mặc định", async () => {
+  const payload = { inviteCode: "", name: "Tự đến", phone: "0977000111", password: "matkhau123", acceptTerms: true };
+  let res = await app.inject({ method: "POST", url: "/v1/auth/register-buyer", payload });
+  assert.equal(res.statusCode, 400);
+  assert.equal((await app.inject({ method: "GET", url: "/v1/public/signup-info" })).json().defaultAffiliate, null);
+  deps.config.defaultInviteCode = "PHUC";
+  assert.equal((await app.inject({ method: "GET", url: "/v1/public/signup-info" })).json().defaultAffiliate.displayName, "Aff PHUC");
+  res = await app.inject({ method: "POST", url: "/v1/auth/register-buyer", payload });
+  assert.equal(res.statusCode, 200, res.body);
+  assert.equal(res.json().affiliate.code, "PHUC");
+  deps.config.defaultInviteCode = "";
+});
+
 test("khóa API sai bị từ chối; khóa đúng được mã hóa, không bao giờ trả lại", async () => {
   let res = await post("/v1/aff/credentials", A.cookie, { network: "accesstrade", accessKey: "khoa-sai-1234567", campaignId: "4751584435713464237" }, "PUT");
   assert.equal(res.statusCode, 400);

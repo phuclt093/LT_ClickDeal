@@ -43,6 +43,16 @@ CONF
 else
   echo "Đã có $ENV_FILE, giữ nguyên."
 fi
+# Affiliate mặc định cho người mua đăng ký không có mã mời:  DEFAULT_INVITE_CODE=PHUC bash platform/deploy/install.sh
+if [ -n "${DEFAULT_INVITE_CODE:-}" ]; then
+  CODE="$(printf '%s' "$DEFAULT_INVITE_CODE" | tr '[:lower:]' '[:upper:]' | tr -cd 'A-Z0-9')"
+  if grep -q '^DEFAULT_INVITE_CODE=' "$ENV_FILE"; then
+    sed -i "s/^DEFAULT_INVITE_CODE=.*/DEFAULT_INVITE_CODE=$CODE/" "$ENV_FILE"
+  else
+    echo "DEFAULT_INVITE_CODE=$CODE" >> "$ENV_FILE"
+  fi
+  echo "Người mua không có mã mời sẽ được gắn vào affiliate $CODE."
+fi
 
 say "3/5 Build và chạy Postgres + API + worker"
 sudo docker compose --project-directory "$SERVER_DIR" -f "$SERVER_DIR/docker-compose.yml" up -d --build

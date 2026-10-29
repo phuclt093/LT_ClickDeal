@@ -10,6 +10,8 @@ export interface AppConfig {
   publicBaseUrl: string;
   cookieSecure: boolean;
   autoApproveAffiliates: boolean;
+  /** Mã affiliate nhận người mua tự đăng ký không có mã mời (để trống = bắt buộc có mã mời). */
+  defaultInviteCode: string;
   accesstradeBaseUrl: string;
   shopeeGraphqlUrl: string;
   syncIntervalMs: number;
@@ -35,6 +37,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     publicBaseUrl: (env.PUBLIC_BASE_URL || "").replace(/\/$/, ""),
     cookieSecure: bool(env.COOKIE_SECURE, true),
     autoApproveAffiliates: bool(env.AUTO_APPROVE_AFFILIATES, false),
+    defaultInviteCode: (env.DEFAULT_INVITE_CODE || "").trim().toUpperCase(),
     accesstradeBaseUrl: (env.ACCESSTRADE_BASE_URL || "https://api.accesstrade.vn").replace(/\/$/, ""),
     shopeeGraphqlUrl: env.SHOPEE_GRAPHQL_URL || "https://open-api.affiliate.shopee.vn/graphql",
     syncIntervalMs: Number(env.SYNC_INTERVAL_MS || 20 * 60 * 1000),
