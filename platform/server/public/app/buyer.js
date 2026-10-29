@@ -353,8 +353,9 @@
     CD.api("POST", "/v1/ext/extension-key", {}).then(function (r) {
       var box = $("extKeyBox");
       box.textContent = "";
-      box.appendChild(CD.copyRow(r.token));
-      box.appendChild(el("p", "tiny muted", "Mã chỉ hiện 1 lần. Không chia sẻ mã này cho người khác."));
+      // chuỗi kết nối = địa chỉ ClickDeal + mã: tiện ích dán 1 lần là đủ
+      box.appendChild(CD.copyRow(location.origin + "/#key=" + r.token, "Copy chuỗi kết nối"));
+      box.appendChild(el("p", "tiny muted", "Chuỗi chỉ hiện 1 lần. Không chia sẻ cho người khác: ai có chuỗi này là tạo được link bằng tài khoản của bạn."));
       $("extKeyOff").hidden = false;
     }).catch(function (e) { CD.toast(e.message, true); });
   });
@@ -374,6 +375,14 @@
 
   // ---------- Khởi động ----------
   setupInstall();
+  // Mở từ tiện ích trình duyệt: /app/#report=<mã lượt bấm> → mở form báo đơn cho đúng sản phẩm
+  var report = (location.hash.match(/^#report=([0-9a-f-]{36})$/i) || [])[1];
+  if (report) window.history.replaceState(null, "", "/app/#orders");
   CD.tabs(["buy", "orders", "account"], function (t) { if (t === "orders") loadClaims(); });
-  loadMe().then(refresh).catch(function () {});
+  loadMe().then(refresh).then(function () {
+    if (!report) return;
+    var l = hist.links.filter(function (x) { return x.id === report; })[0];
+    if (l && l.claim_no) CD.toast("Sản phẩm này đã được báo đơn #" + l.claim_no);
+    else openClaimForm(l ? report : undefined);
+  }).catch(function () {});
 })();

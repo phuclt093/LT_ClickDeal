@@ -6,8 +6,12 @@
 
   function provider() { return CD_PROVIDERS[settings.provider] || CD_PROVIDERS[CD_DEFAULT_SETTINGS.provider]; }
 
-  // Các trang tiện ích cần quyền (lấy từ manifest)
-  var ORIGINS = chrome.runtime.getManifest().host_permissions || [];
+  // Các trang tiện ích cần quyền (lấy từ manifest) + địa chỉ ClickDeal (nếu dùng)
+  var BASE_ORIGINS = chrome.runtime.getManifest().host_permissions || [];
+  function origins() {
+    var o = cdOrigin(settings.serverUrl);
+    return provider().api && o ? BASE_ORIGINS.concat([o + "/*"]) : BASE_ORIGINS;
+  }
 
   async function save(patch) {
     Object.assign(settings, patch);
@@ -50,7 +54,12 @@
   function renderAccount() {
     var p = provider();
     document.querySelectorAll(".pname").forEach(function (el) { el.textContent = p.name; });
-    $("signupBtn").href = p.signupUrl || p.homeUrl.replace("{username}", "");
+    $("signupActions").hidden = !!p.api;
+    if (p.api) {
+      $("signupBtn").removeAttribute("href");
+    } else {
+      $("signupBtn").href = p.signupUrl || p.homeUrl.replace("{username}", "");
+    }
     $("signupBtn").textContent = "Mở trang đăng ký " + p.name;
     $("loginBtn").href = p.loginUrl || p.walletUrl;
     var tips = $("tips");
@@ -74,21 +83,26 @@
     var showRef = !!CD_REFERRAL_CODE && p.id === "tietkiem360";
     $("referral").hidden = !showRef;
     $("refCode").textContent = CD_REFERRAL_CODE;
-    $("confirmRow").hidden = p.needsUsername;
+    $("confirmRow").hidden = p.needsUsername || !!p.api;
     $("confirmLogin").checked = !!settings.providerConfirmed;
   }
 
   // ---------- Bước 3: username ----------
   function renderUsername() {
     var p = provider();
-    $("step3").classList.toggle("is-hidden", !p.needsUsername);
+    $("step3").classList.toggle("is-hidden", !p.needsUsername && !p.api);
+    $("userBox").hidden = !!p.api;
+    $("connectBox").hidden = !p.api;
+    if (p.api && document.activeElement !== $("connectInput") && settings.serverUrl && settings.connectKey) {
+      $("connectInput").value = cdOrigin(settings.serverUrl) + "/#key=" + settings.connectKey;
+    }
     if (document.activeElement !== $("username")) $("username").value = settings.username || "";
   }
 
   // ---------- Bước 4: quyền ----------
   async function checkPerm() {
     try {
-      hasPerm = await chrome.permissions.contains({ origins: ORIGINS });
+      hasPerm = await chrome.permissions.contains({ origins: origins() });
     } catch (e) {
       hasPerm = true; // trình duyệt không hỗ trợ kiểm tra → coi như đã có
     }
@@ -108,11 +122,11 @@
     renderUsername();
     renderPerm();
 
-    var userOk = !p.needsUsername || CD_USERNAME_RE.test(settings.username || "");
-    var accountOk = p.needsUsername ? userOk : !!settings.providerConfirmed;
+    var userOk = p.api ? cdIsSetupDone(settings) : !p.needsUsername || CD_USERNAME_RE.test(settings.username || "");
+    var accountOk = p.api ? userOk : p.needsUsername ? userOk : !!settings.providerConfirmed;
     $("step1").classList.add("is-done");
     $("step2").classList.toggle("is-done", accountOk);
-    $("step3").classList.toggle("is-done", userOk && p.needsUsername);
+    $("step3").classList.toggle("is-done", userOk && (p.needsUsername || !!p.api));
     $("step4").classList.toggle("is-done", hasPerm);
 
     // đánh số lại khi bước 3 bị ẩn
@@ -142,6 +156,46 @@
     });
   });
 
+  // ClickDeal: dán chuỗi kết nối → xin quyền gọi tới địa chỉ đó → lưu → kiểm tra
+  $("connectForm").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var c = cdParseConnect($("connectInput").value);
+    var msg = $("connectMsg");
+    if (!c.serverUrl || !c.connectKey) {
+      msg.className = "msg err";
+      msg.textContent = "Chuỗi chưa đúng. Cần có cả địa chỉ https://… và mã cdk_… (copy nguyên chuỗi trong ClickDeal).";
+      return;
+    }
+    var want = BASE_ORIGINS.concat([c.serverUrl + "/*"]);
+    // phải gọi ngay trong sự kiện bấm (không await trước) thì trình duyệt mới cho hỏi quyền
+    chrome.permissions.request({ origins: want }).then(function (ok) {
+      if (!ok) {
+        msg.className = "msg err";
+        msg.textContent = "Bạn cần bấm Cho phép (Allow) để tiện ích gọi được ClickDeal.";
+        return;
+      }
+      hasPerm = true;
+      msg.className = "msg";
+      msg.textContent = "Đang kiểm tra…";
+      return save({ serverUrl: c.serverUrl, connectKey: c.connectKey, provider: "clickdeal" }).then(function () {
+        chrome.runtime.sendMessage({ type: "CD_TEST_CONNECT" }, function (r) {
+          if (r && r.ok) {
+            msg.className = "msg ok";
+            msg.textContent = "✓ Đã kết nối: " + (r.me.nickname || "") + " · người giới thiệu " + r.me.affiliate + "." +
+              (r.me.hasBank ? "" : " Nhớ thêm tài khoản ngân hàng trong ClickDeal để nhận tiền.");
+          } else {
+            msg.className = "msg err";
+            msg.textContent = (r && r.error) || "Không kiểm tra được kết nối";
+          }
+          checkPerm();
+        });
+      });
+    }).catch(function (e) {
+      msg.className = "msg err";
+      msg.textContent = "Không xin được quyền: " + e.message;
+    });
+  });
+
   $("confirmLogin").addEventListener("change", function () {
     save({ providerConfirmed: $("confirmLogin").checked });
   });
@@ -155,7 +209,7 @@
 
   $("permBtn").addEventListener("click", function () {
     // phải gọi ngay trong sự kiện click (không await trước) thì trình duyệt mới cho hỏi quyền
-    chrome.permissions.request({ origins: ORIGINS }).then(function (ok) {
+    chrome.permissions.request({ origins: origins() }).then(function (ok) {
       hasPerm = !!ok;
       if (!ok) {
         $("permMsg").className = "msg err";

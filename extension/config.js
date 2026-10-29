@@ -14,6 +14,20 @@
  *   errorSelector    chỗ trang hiện thông báo lỗi
  */
 var CD_PROVIDERS = {
+  // Nền tảng ClickDeal của người giới thiệu: gọi thẳng API bằng mã kết nối, không cần mở trang khác
+  clickdeal: {
+    id: "clickdeal",
+    name: "ClickDeal (người giới thiệu)",
+    api: true,
+    recommended: true,
+    blurb: "Kết nối tài khoản ClickDeal của bạn. Bấm nút là có link hoàn tiền ngay (1–2 giây), không mở trang khác. Báo đơn và nhận tiền từ người giới thiệu.",
+    signupTips: [
+      "Mở <b>link mời</b> người giới thiệu gửi cho bạn (dạng https://…/j/MÃ) và tạo tài khoản bằng <b>số điện thoại</b>.",
+      "Trong ClickDeal, vào tab <b>Tài khoản</b> → mục <b>Tiện ích trên máy tính</b> → bấm <b>Tạo mã kết nối</b> → <b>Copy</b>.",
+      "Thêm luôn <b>tài khoản ngân hàng</b> trong tab Tài khoản để người giới thiệu chuyển tiền hoàn cho bạn."
+    ],
+    resultTimeoutMs: 20000
+  },
   tietkiem360: {
     id: "tietkiem360",
     name: "TietKiem360",
@@ -21,7 +35,6 @@ var CD_PROVIDERS = {
     walletUrl: "https://tietkiem360.site/Home/Login",
     signupUrl: "https://tietkiem360.site/Home/SignUp",
     loginUrl: "https://tietkiem360.site/Home/Login",
-    recommended: true,
     blurb: "Chỉ cần username là tạo được link, không cần đăng nhập mỗi lần. Tiền về MoMo/ngân hàng bạn khai khi đăng ký.",
     signupTips: [
       "<b>Tên đăng nhập</b>: chính là <b>username</b> bạn sẽ nhập vào tiện ích ở bước 3. Nên dùng chữ thường, không dấu, dễ nhớ.",
@@ -73,10 +86,34 @@ var CD_PROVIDERS = {
 };
 
 var CD_DEFAULT_SETTINGS = {
-  provider: "tietkiem360",
+  provider: "clickdeal",
   username: "", // username nhận tiền của NGƯỜI DÙNG (tự nhập ở trang hướng dẫn)
+  serverUrl: "", // ClickDeal: địa chỉ server, vd https://abc.trycloudflare.com
+  connectKey: "", // ClickDeal: mã kết nối "cdk_…" tạo trong ứng dụng ClickDeal
   autoOpen: true // lấy được link xong thì tự mở link hoàn tiền để mua
 };
+
+var CD_KEY_RE = /^cdk_[A-Za-z0-9_-]{20,80}$/;
+
+/** Địa chỉ gốc của server ClickDeal (chỉ https, hoặc http://localhost khi chạy thử). */
+function cdOrigin(url) {
+  try {
+    var u = new URL(String(url || "").trim());
+    if (u.protocol === "https:" || (u.protocol === "http:" && /^(localhost|127\.0\.0\.1)$/.test(u.hostname))) return u.origin;
+  } catch (e) { /* không hợp lệ */ }
+  return "";
+}
+
+/**
+ * Tách "chuỗi kết nối" ứng dụng ClickDeal đưa cho (vd https://abc.trycloudflare.com/#key=cdk_…).
+ * Chấp nhận cả khi chỉ dán mã cdk_… hoặc chỉ dán địa chỉ.
+ */
+function cdParseConnect(text) {
+  var s = String(text || "").trim();
+  var key = (s.match(/cdk_[A-Za-z0-9_-]{20,80}/) || [])[0] || "";
+  var url = (s.match(/https?:\/\/[^\s#"'<>]+/i) || [])[0] || "";
+  return { serverUrl: cdOrigin(url), connectKey: key };
+}
 
 // Mã giới thiệu gợi ý khi người dùng đăng ký tài khoản mới (để trống "" nếu không muốn hiện)
 var CD_REFERRAL_CODE = "phuclt093";
@@ -87,11 +124,13 @@ var CD_USERNAME_RE = /^[A-Za-z0-9_.@-]{3,50}$/;
 function cdIsSetupDone(settings) {
   var p = CD_PROVIDERS[settings.provider];
   if (!p) return false;
+  if (p.api) return !!cdOrigin(settings.serverUrl) && CD_KEY_RE.test(settings.connectKey || "");
   if (p.needsUsername) return CD_USERNAME_RE.test(settings.username || "");
   return !!settings.providerConfirmed;
 }
 
 function cdProviderUrl(provider, settings) {
+  if (provider.api) return cdOrigin(settings && settings.serverUrl) + "/app/";
   return provider.homeUrl.replace("{username}", encodeURIComponent((settings && settings.username) || ""));
 }
 

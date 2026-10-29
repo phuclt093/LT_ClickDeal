@@ -82,6 +82,70 @@ function updateBadge(logs) {
   chrome.action.setBadgeBackgroundColor({ color: "#e37400" });
 }
 
+// ---------- Chế độ ClickDeal: gọi thẳng API bằng mã kết nối ----------
+async function clickdealApi(settings, method, path, body) {
+  var origin = cdOrigin(settings.serverUrl);
+  if (!origin) throw new Error("Chưa nhập địa chỉ ClickDeal");
+  var res;
+  try {
+    res = await fetch(origin + path, {
+      method: method,
+      headers: Object.assign(
+        { Accept: "application/json", Authorization: "Bearer " + settings.connectKey },
+        body ? { "Content-Type": "application/json" } : {}
+      ),
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: "omit"
+    });
+  } catch (e) {
+    throw new Error("Không kết nối được ClickDeal (" + origin + "). Địa chỉ có thể đã đổi: lấy địa chỉ mới rồi cập nhật trong tiện ích.");
+  }
+  var j = await res.json().catch(function () { return {}; });
+  if (res.status === 401) throw new Error("Mã kết nối hết hiệu lực. Vào ClickDeal → Tài khoản → Tạo mã kết nối mới.");
+  if (!res.ok) throw new Error(j.error || "ClickDeal báo lỗi " + res.status);
+  return j;
+}
+
+async function startClickdeal(settings, provider, product, sender) {
+  var origin = cdOrigin(settings.serverUrl);
+  var entry = {
+    id: newId(),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    provider: provider.id,
+    providerName: "ClickDeal",
+    walletUrl: origin + "/app/#orders",
+    username: "",
+    product: product,
+    affiliateUrl: "",
+    status: "pending",
+    note: ""
+  };
+  var logs = await getLogs();
+  logs.unshift(entry);
+  await chrome.storage.local.set({ [LOGS]: logs.slice(0, 1000) });
+  updateBadge(logs);
+  var clip = function (v, n) { return v ? String(v).slice(0, n) : undefined; };
+  try {
+    var r = await clickdealApi(settings, "POST", "/v1/ext/links", {
+      url: product.productUrl,
+      source: "extension",
+      product: {
+        name: clip(product.name, 480),
+        price: clip(product.price, 60),
+        image: /^https:\/\//i.test(product.image || "") ? clip(product.image, 1000) : undefined
+      }
+    });
+    await updateLog(entry.id, { affiliateUrl: r.affLink, linkId: r.linkId, status: "ready", note: "" });
+    updateBadge(await getLogs());
+    if (settings.autoOpen && sender.tab) chrome.tabs.update(sender.tab.id, { url: r.affLink });
+    return { ok: true, id: entry.id, affLink: r.affLink };
+  } catch (e) {
+    await updateLog(entry.id, { status: "manual", note: e.message });
+    return { ok: false, error: e.message };
+  }
+}
+
 async function handle(msg, sender) {
   switch (msg.type) {
     case "CD_OPEN_SETUP": {
@@ -97,6 +161,7 @@ async function handle(msg, sender) {
         await openSetup("need-setup");
         return { ok: true, setup: true };
       }
+      if (provider.api) return startClickdeal(settings, provider, msg.product, sender);
       var entry = {
         id: newId(),
         createdAt: Date.now(),
@@ -125,6 +190,17 @@ async function handle(msg, sender) {
         product: msg.product, username: settings.username || ""
       });
       return { ok: true, id: entry.id };
+    }
+
+    // Trang hướng dẫn / popup: kiểm tra mã kết nối ClickDeal
+    case "CD_TEST_CONNECT": {
+      var s0 = Object.assign({}, await getSettings(), msg.settings || {});
+      try {
+        var me = await clickdealApi(s0, "GET", "/v1/ext/me");
+        return { ok: true, me: { nickname: me.nickname, affiliate: me.affiliate.displayName, hasBank: !!me.bank } };
+      } catch (e) {
+        return { ok: false, error: e.message };
+      }
     }
 
     case "CD_GET_JOB": {

@@ -19,7 +19,7 @@
 
   function cameFromAffiliate() {
     return CD_AFF_PARAMS.test(location.search) ||
-      /hoantien\.com|tietkiem360\.site|shp\.ee|shope\.ee|s\.shopee\.vn/i.test(document.referrer);
+      /hoantien\.com|tietkiem360\.site|shp\.ee|shope\.ee|s\.shopee\.vn|trycloudflare\.com|isclix\.com|workers\.dev/i.test(document.referrer);
   }
 
   function readJsonLdProduct() {
@@ -105,12 +105,26 @@
       busy = false;
       refreshLabels();
       if (chrome.runtime.lastError || !res || !res.ok) {
-        document.querySelectorAll(".cd-btn").forEach(function (b) { b.textContent = "⚠ Lỗi, thử lại"; });
+        var err = (res && res.error) || "Không tạo được link";
+        document.querySelectorAll(".cd-btn").forEach(function (b) { b.textContent = "⚠ Lỗi, thử lại"; b.title = err; });
+        toast(err);
       } else if (res.setup) {
         document.querySelectorAll(".cd-btn").forEach(function (b) { b.textContent = "Cần thiết lập trước ↗"; });
         setTimeout(refreshLabels, 4000);
       }
     });
+  }
+
+  // Thông báo nhỏ ở góc màn hình (dùng khi tạo link lỗi)
+  function toast(text) {
+    var old = document.getElementById("cd-toast");
+    if (old) old.remove();
+    var t = document.createElement("div");
+    t.id = "cd-toast";
+    t.className = "cd-toast";
+    t.textContent = "ClickDeal: " + text;
+    document.documentElement.appendChild(t);
+    setTimeout(function () { t.remove(); }, 8000);
   }
 
   function makeButton() {

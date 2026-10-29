@@ -40,7 +40,7 @@
       });
   };
   CD.toLogin = function () {
-    location.replace("/?next=" + encodeURIComponent(location.pathname + location.search));
+    location.replace("/?next=" + encodeURIComponent(location.pathname + location.search + location.hash));
   };
   CD.logout = function () {
     CD.api("POST", "/v1/auth/logout", {}).finally(function () { location.replace("/"); });

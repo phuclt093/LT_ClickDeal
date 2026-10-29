@@ -42,7 +42,7 @@
       <div class="content">
         <h2>Tạo tài khoản <span class="pname"></span></h2>
         <p class="muted">Đã có tài khoản thì bỏ qua bước này.</p>
-        <div class="actions">
+        <div class="actions" id="signupActions">
           <a id="signupBtn" class="btn" target="_blank" rel="noopener">Mở trang đăng ký</a>
           <a id="loginBtn" class="btn ghost" target="_blank" rel="noopener">Tôi đã có tài khoản, đăng nhập</a>
         </div>
@@ -63,14 +63,26 @@
     <section class="step" id="step3">
       <div class="num">3</div>
       <div class="content">
-        <h2>Nhập username nhận tiền</h2>
-        <p class="muted">Là <b>Tên đăng nhập</b> bạn đã đặt ở bước 2. Tiền hoàn sẽ về đúng tài khoản này.</p>
-        <form id="userForm" class="userform" autocomplete="off">
-          <input id="username" type="text" placeholder="vd: nguyenvana" spellcheck="false" required>
-          <button class="btn" type="submit">Lưu</button>
-        </form>
-        <p id="userMsg" class="msg"></p>
-        <p class="warn small">⚠ Gõ chính xác từng chữ. Sai username thì tiền có thể về tài khoản người khác hoặc không ai nhận.</p>
+        <div id="userBox">
+          <h2>Nhập username nhận tiền</h2>
+          <p class="muted">Là <b>Tên đăng nhập</b> bạn đã đặt ở bước 2. Tiền hoàn sẽ về đúng tài khoản này.</p>
+          <form id="userForm" class="userform" autocomplete="off">
+            <input id="username" type="text" placeholder="vd: nguyenvana" spellcheck="false" required>
+            <button class="btn" type="submit">Lưu</button>
+          </form>
+          <p id="userMsg" class="msg"></p>
+          <p class="warn small">⚠ Gõ chính xác từng chữ. Sai username thì tiền có thể về tài khoản người khác hoặc không ai nhận.</p>
+        </div>
+        <div id="connectBox" hidden>
+          <h2>Dán chuỗi kết nối ClickDeal</h2>
+          <p class="muted">Copy ở ClickDeal → <b>Tài khoản</b> → <b>Tiện ích trên máy tính</b> → <b>Tạo mã kết nối</b>. Chuỗi có dạng <code>https://…/#key=cdk_…</code>.</p>
+          <form id="connectForm" class="userform" autocomplete="off">
+            <input id="connectInput" type="text" placeholder="https://….trycloudflare.com/#key=cdk_…" spellcheck="false" required>
+            <button class="btn" type="submit">Kết nối</button>
+          </form>
+          <p id="connectMsg" class="msg"></p>
+          <p class="muted small">Địa chỉ ClickDeal đổi (vd sau khi máy chủ khởi động lại)? Bấm icon ClickDeal trên thanh công cụ, sửa ô <b>Địa chỉ ClickDeal</b>, mã kết nối vẫn giữ nguyên.</p>
+        </div>
       </div>
     </section>
 
@@ -104,6 +116,7 @@
           <li>Chờ vài giây: tiện ích tự tạo link hoàn tiền rồi <b>tự mở lại sản phẩm</b>. Nút sẽ đổi thành
             <span class="demo-ok">✓ Đã qua link hoàn tiền</span>.</li>
           <li>Bấm <b>Mua Ngay</b> và đặt hàng như bình thường.</li>
+          <li>Dùng <b>ClickDeal</b>: đặt xong, bấm icon ClickDeal trên thanh công cụ → <b>📝 Báo đơn</b> ở sản phẩm vừa mua, nhập mã đơn Shopee để người giới thiệu trả tiền hoàn.</li>
         </ol>
         <div class="rules">
           <b>Để không bị mất hoàn tiền:</b>
@@ -142,7 +155,7 @@
       </details>
     </section>
 
-    <footer class="muted small">ClickDeal không thu thập dữ liệu. Lịch sử và cài đặt chỉ lưu trên máy bạn.</footer>
+    <footer class="muted small">Lịch sử và cài đặt lưu trên máy bạn. Với ClickDeal, sản phẩm bạn bấm mua được gửi tới máy chủ ClickDeal của người giới thiệu để tạo link và ghi nhận hoàn tiền.</footer>
   </div>
 
   <script src="../config.js"></script>

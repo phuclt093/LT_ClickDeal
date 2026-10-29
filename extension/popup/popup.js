@@ -64,8 +64,17 @@
         copy.hidden = true;
       }
       var wallet = n.querySelector(".wallet");
-      wallet.textContent = "Ví " + (l.providerName || "hoàn tiền");
-      wallet.href = l.walletUrl || "#";
+      if (l.provider === "clickdeal") {
+        // Chế độ ClickDeal: mua xong thì báo đơn để nhận hoàn tiền
+        var origin = (l.walletUrl || "").replace(/\/app\/.*$/, "");
+        wallet.textContent = l.linkId ? "📝 Báo đơn" : "Mở ClickDeal";
+        wallet.classList.add("report");
+        wallet.href = l.linkId ? origin + "/app/#report=" + l.linkId : l.walletUrl || "#";
+        wallet.title = "Đặt hàng xong, báo mã đơn Shopee để nhận hoàn tiền";
+      } else {
+        wallet.textContent = "Ví " + (l.providerName || "hoàn tiền");
+        wallet.href = l.walletUrl || "#";
+      }
 
       n.querySelector(".del").addEventListener("click", async function () {
         var all = await getLogs();
@@ -74,8 +83,8 @@
 
       n.querySelector(".note").textContent = l.note || "";
 
-      var form = n.querySelector(".manual");
-      if (l.status === "ready") form.hidden = true;
+      var form = n.querySelector("form.manual");
+      if (l.status === "ready" || l.provider === "clickdeal") form.hidden = true;
       form.addEventListener("submit", function (ev) {
         ev.preventDefault();
         var v = form.querySelector("input").value.trim();
@@ -135,7 +144,45 @@
   function syncUserRow() {
     var p = CD_PROVIDERS[$provider.value];
     $userRow.hidden = !(p && p.needsUsername);
+    document.getElementById("connectBox").hidden = !(p && p.api);
   }
+
+  // ---------- ClickDeal: địa chỉ + mã kết nối ----------
+  var $server = document.getElementById("serverUrl");
+  var $key = document.getElementById("connectKey");
+  var $cmsg = document.getElementById("connectMsg");
+  function cmsg(text, kind) { $cmsg.textContent = text; $cmsg.className = "muted conn-msg " + (kind || ""); }
+  // dán cả chuỗi kết nối vào 1 ô → tự tách địa chỉ và mã
+  [$server, $key].forEach(function (inp) {
+    inp.addEventListener("input", function () {
+      var c = cdParseConnect(inp.value);
+      if (c.serverUrl && c.connectKey) { $server.value = c.serverUrl; $key.value = c.connectKey; }
+    });
+  });
+  function setOpenApp(origin) {
+    var a = document.getElementById("openApp");
+    a.hidden = !origin;
+    a.href = origin ? origin + "/app/" : "#";
+  }
+  document.getElementById("connectSave").addEventListener("click", function () {
+    var origin = cdOrigin($server.value) || cdParseConnect($server.value).serverUrl;
+    var key = cdParseConnect($key.value).connectKey || $key.value.trim();
+    if (!origin) return cmsg("Địa chỉ phải bắt đầu bằng https://", "err");
+    if (!CD_KEY_RE.test(key)) return cmsg("Mã kết nối phải bắt đầu bằng cdk_ (tạo trong ClickDeal → Tài khoản)", "err");
+    // xin quyền gọi tới địa chỉ này — phải gọi ngay trong lúc bấm nút
+    chrome.permissions.request({ origins: [origin + "/*"] }).then(function (ok) {
+      if (!ok) return cmsg("Bạn cần bấm Cho phép (Allow) để tiện ích gọi được ClickDeal.", "err");
+      cmsg("Đang kiểm tra…");
+      saveSettings({ serverUrl: origin, connectKey: key }).then(function () {
+        $server.value = origin;
+        setOpenApp(origin);
+        chrome.runtime.sendMessage({ type: "CD_TEST_CONNECT" }, function (r) {
+          if (r && r.ok) cmsg("✓ Đã kết nối: " + (r.me.nickname || "") + " · qua " + r.me.affiliate + (r.me.hasBank ? "" : " · nhớ thêm ngân hàng trong ClickDeal"), "ok");
+          else cmsg((r && r.error) || "Không kiểm tra được", "err");
+        });
+      });
+    }).catch(function (e) { cmsg("Không xin được quyền: " + e.message, "err"); });
+  });
 
   function updateWarn(s) {
     document.getElementById("setupWarn").hidden = cdIsSetupDone(s);
@@ -167,6 +214,9 @@
     if (!CD_PROVIDERS[s.provider]) s.provider = CD_DEFAULT_SETTINGS.provider;
     $provider.value = s.provider;
     $username.value = s.username || "";
+    $server.value = s.serverUrl || "";
+    $key.value = s.connectKey || "";
+    setOpenApp(cdOrigin(s.serverUrl));
     $auto.checked = !!s.autoOpen;
     syncUserRow();
     updateWarn(s);

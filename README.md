@@ -1,6 +1,19 @@
 # LT_ClickDeal
 
 Tiện ích Chrome/Firefox: thêm nút **💰 Mua qua hoàn tiền** ngay cạnh nút "Mua Ngay" trên trang sản phẩm Shopee.
+
+## Chế độ ClickDeal (khuyên dùng, từ bản 0.3)
+
+Kết nối thẳng với nền tảng ClickDeal của người giới thiệu (`platform/`):
+
+1. Người mua mở link mời, tạo tài khoản ClickDeal, vào **Tài khoản → Tiện ích trên máy tính → Tạo mã kết nối**, copy chuỗi dạng `https://…/#key=cdk_…`.
+2. Trong tiện ích: trang **Thiết lập** → chọn **ClickDeal** → dán chuỗi vào bước 3 → **Kết nối** (trình duyệt hỏi quyền truy cập đúng địa chỉ đó).
+3. Trên Shopee bấm nút: tiện ích gọi API ClickDeal, có link hoàn tiền trong 1–2 giây và mở lại sản phẩm ngay trong tab, không mở trang khác.
+4. Đặt hàng xong: bấm icon tiện ích → **📝 Báo đơn** ở sản phẩm vừa mua → ứng dụng ClickDeal mở sẵn form báo đơn cho đúng sản phẩm.
+
+Địa chỉ `trycloudflare.com` đổi thì chỉ cần sửa ô **Địa chỉ ClickDeal** trong popup rồi bấm **Lưu & kiểm tra**; mã kết nối giữ nguyên.
+
+Hai chế độ cũ (TietKiem360, HoanTien.com: tự điền form trên trang hoàn tiền) vẫn giữ nguyên như bên dưới.
 Bấm một lần là tiện ích tự đẩy link sang trang hoàn tiền (mặc định **TietKiem360** với username của bạn, hoặc **hoantien.com**),
 lấy link hoàn tiền, lưu lịch sử mua và mở link đó để bạn mua như bình thường.
 
@@ -38,7 +51,7 @@ Muốn mở lại trang: bấm icon ClickDeal rồi bấm **Hướng dẫn**.
 
 Sửa code xong thì bấm nút ↻ (Reload) của tiện ích trong `chrome://extensions`.
 
-### Firefox (bản 121 trở lên)
+### Firefox (bản 128 trở lên)
 
 1. Mở `about:debugging#/runtime/this-firefox`.
 2. Bấm **Load Temporary Add-on…** và chọn file `extension/manifest.json`.

@@ -29,6 +29,22 @@
       <label for="provider">Trang hoàn tiền</label>
       <select id="provider"></select>
     </div>
+    <div id="connectBox" hidden>
+      <div class="row">
+        <label for="serverUrl">Địa chỉ ClickDeal</label>
+        <input id="serverUrl" type="text" placeholder="https://….trycloudflare.com" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="row">
+        <label for="connectKey">Mã kết nối</label>
+        <input id="connectKey" type="password" placeholder="Dán chuỗi kết nối cdk_…" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="row">
+        <label></label>
+        <button id="connectSave" type="button" class="primary">Lưu &amp; kiểm tra</button>
+        <a id="openApp" target="_blank" rel="noopener" class="linkbtn">Mở ClickDeal</a>
+      </div>
+      <div id="connectMsg" class="muted conn-msg"></div>
+    </div>
     <div class="row" id="usernameRow">
       <label for="username">Username nhận tiền</label>
       <input id="username" type="text" placeholder="vd: phuclt093" autocomplete="off" spellcheck="false">

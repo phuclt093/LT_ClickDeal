@@ -151,8 +151,8 @@ main { padding: 4px 12px 12px; }
 .links a:hover, .linkbtn:hover { text-decoration: underline; }
 .note { margin-top: 4px; }
 .note:empty { display: none; }
-.manual { display: flex; gap: 6px; margin-top: 6px; }
-.manual input {
+form.manual { display: flex; gap: 6px; margin-top: 6px; }
+form.manual input {
   flex: 1;
   min-width: 0;
   padding: 4px 6px;
@@ -161,7 +161,7 @@ main { padding: 4px 12px 12px; }
   background: var(--bg);
   color: var(--fg);
 }
-.manual button {
+form.manual button {
   border: 0;
   border-radius: 6px;
   padding: 4px 10px;
@@ -169,3 +169,15 @@ main { padding: 4px 12px 12px; }
   color: #fff;
 }
 [hidden] { display: none !important; }
+
+.settings input[type=password] {
+  flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--card); color: var(--fg); font: inherit;
+}
+#connectBox { display: flex; flex-direction: column; gap: 6px; }
+#connectBox[hidden] { display: none !important; }
+.primary { background: var(--green); color: #fff; border: 0; border-radius: 6px; padding: 6px 12px; font-weight: 600; }
+.conn-msg { min-height: 0; }
+.conn-msg.ok { color: var(--green); font-weight: 600; }
+.conn-msg.err { color: var(--red); font-weight: 600; }
+.report { font-weight: 600; }
